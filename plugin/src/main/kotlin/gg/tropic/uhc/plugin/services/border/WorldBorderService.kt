@@ -20,6 +20,16 @@ object WorldBorderService
 
     }
 
+    fun setCenter(center: Location) =
+        apply {
+            this.center = center
+        }
+
+    fun setSize(size: Double) =
+        apply {
+            this.size = size
+        }
+
     private fun synchronizeBukkitWorldBorder()
     {
         val worldBorder = center!!.world.worldBorder

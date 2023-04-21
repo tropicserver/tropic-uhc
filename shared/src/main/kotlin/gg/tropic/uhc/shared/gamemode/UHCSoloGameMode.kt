@@ -31,7 +31,7 @@ object UHCSoloGameMode : CgsGameMode
 
         override fun getDirectory(): Path? = null
 
-        override fun getBukkitWorldName() = "world"
+        override fun getBukkitWorldName() = "uhc_world"
 
         override fun getPreLobbyLocation() = Location(
             Bukkit.getWorld("lobby"),
@@ -39,8 +39,8 @@ object UHCSoloGameMode : CgsGameMode
         )
 
         override fun getSpectatorLocation() = Location(
-            Bukkit.getWorld("world"), 0.5,
-            Bukkit.getWorld("world").getHighestBlockYAt(0, 0) + 15.0, 0.5
+            Bukkit.getWorld("uhc_world"), 0.5,
+            Bukkit.getWorld("uhc_world").getHighestBlockYAt(0, 0) + 15.0, 0.5
         )
     }
 
