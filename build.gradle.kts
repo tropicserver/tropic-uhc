@@ -26,6 +26,13 @@ subprojects {
 
     dependencies {
         compileOnly(kotlin("stdlib"))
+
+        compileOnly("gg.scala.commons:bukkit:3.1.9")
+        compileOnly("gg.scala.store:spigot:0.1.8")
+        compileOnly("gg.scala.spigot:server:1.1.0")
+
+        compileOnly("gg.scala.lemon:bukkit:1.6.2")
+        compileOnly("gg.scala.cgs:common:1.1.9")
     }
 
     kotlin {
@@ -55,7 +62,7 @@ subprojects {
 
         publications {
             register(
-                name = "mavenJava",
+                name = "shadow",
                 MavenPublication::class
             ) {
                 from(components["java"])
@@ -74,6 +81,7 @@ subprojects {
 fun RepositoryHandler.configureScalaRepository()
 {
     maven("${property("artifactory_contextUrl")}/gradle-release") {
+        name = "scala"
         credentials {
             username = property("artifactory_user").toString()
             password = property("artifactory_password").toString()

@@ -1,0 +1,27 @@
+package gg.tropic.uhc.shared
+
+import gg.scala.cgs.common.information.CgsGameAwardInfo
+import gg.scala.cgs.common.information.CgsGameGeneralInfo
+
+/**
+ * @author GrowlyX
+ * @since 4/20/2023
+ */
+object UHCGameInfo : CgsGameGeneralInfo(
+    fancyNameRender = "UHC",
+    gameVersion = 1.0F,
+    minimumPlayers = 2,
+    startingCountdownSec = 61,
+    awards = CgsGameAwardInfo(
+        awardCoins = true,
+        winningCoinRange = 1000..2000,
+        participationCoinRange = 25..100
+    ),
+    preStartVoting = true,
+    disqualifyOnLogout = true,
+    spectateOnDeath = true,
+    showTabHearts = false,
+    showNameHearts = true,
+    usesCustomArenaWorld = true,
+    gameModes = listOf()
+)
