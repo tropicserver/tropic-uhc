@@ -35,7 +35,7 @@ object UHCSoloGameMode : CgsGameMode
 
         override fun getPreLobbyLocation() = Location(
             Bukkit.getWorld("lobby"),
-            0.5, 35.0, 0.5
+            0.5, 73.0, 0.5, 90.0f, 0.0f
         )
 
         override fun getSpectatorLocation() = Location(

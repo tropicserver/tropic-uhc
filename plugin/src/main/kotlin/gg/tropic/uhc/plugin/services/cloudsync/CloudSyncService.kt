@@ -1,4 +1,4 @@
-package gg.tropic.uhc.plugin.feature
+package gg.tropic.uhc.plugin.services.cloudsync
 
 import gg.scala.cloudsync.shared.discovery.CloudSyncDiscoveryService
 import gg.scala.commons.agnostic.sync.ServerSync
@@ -14,7 +14,7 @@ import gg.scala.flavor.service.ignore.IgnoreAutoScan
 @Service
 @IgnoreAutoScan
 @SoftDependency("cloudsync")
-object CloudSyncFeature
+object CloudSyncService
 {
     @Configure
     fun configure()
