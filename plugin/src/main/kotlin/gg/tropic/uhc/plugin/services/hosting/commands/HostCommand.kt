@@ -8,6 +8,7 @@ import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.lemon.util.QuickAccess.username
 import gg.tropic.uhc.plugin.services.hosting.HostService
+import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.hosting.isHost
 import gg.tropic.uhc.plugin.services.styles.prefix
 import net.evilblock.cubed.util.CC
@@ -20,6 +21,7 @@ import org.bukkit.Bukkit
 @AutoRegister
 object HostCommand : ScalaCommand()
 {
+    @CommandAlias("host-unbind")
     @CommandPermission("uhc.command.host.unbind")
     fun onHostUnbind(player: ScalaPlayer)
     {
@@ -48,7 +50,7 @@ object HostCommand : ScalaCommand()
         if (HostService.gameHost != null)
         {
             throw ConditionFailedException(
-                "${HostService.gameHost!!.username()} is already hosting this game!"
+                "${hostDisplayName()}${CC.RED} is already hosting this game!"
             )
         }
 

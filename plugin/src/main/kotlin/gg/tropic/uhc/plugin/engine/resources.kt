@@ -14,6 +14,8 @@ import java.util.*
  */
 object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 {
+    private val footerPadding = "${CC.GRAY} ".repeat(8)
+
     override fun getTitle() = "${CC.B_PRI}UHC"
 
     override fun render(
@@ -29,6 +31,6 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
             Bukkit.getMaxPlayers()
         }"
         lines += ""
-        lines += "${CC.GRAY}tropic.gg ${CC.GRAY}   ${CC.GRAY}   ${CC.GRAY}   ${CC.GRAY}"
+        lines += "${CC.GRAY}tropic.gg $footerPadding"
     }
 }
