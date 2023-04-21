@@ -2,6 +2,7 @@ package gg.tropic.uhc.plugin.engine
 
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.states.CgsGameState
+import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -20,9 +21,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
     )
     {
         lines += ""
-
-
-        lines += "${CC.WHITE}Host: ${CC.RED}None"
+        lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
         lines += "${CC.WHITE}Mode: ${CC.GOLD}FFA"
         lines += "${CC.WHITE}Players: ${CC.GOLD}${
             Bukkit.getOnlinePlayers().size
