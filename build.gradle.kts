@@ -62,19 +62,17 @@ subprojects {
 
         publications {
             register(
-                name = "shadow",
-                MavenPublication::class
-            ) {
-                from(components["java"])
-                artifact(tasks["shadowJar"])
-            }
+                name = "mavenJava",
+                type = MavenPublication::class,
+                configurationAction = shadow::component
+            )
         }
     }
 
     tasks.getByName("build")
         .dependsOn(
             "shadowJar",
-            "publishShadowPublicationToScalaRepository"
+            "publishMavenJavaPublicationToScalaRepository"
         )
 }
 
