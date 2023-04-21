@@ -2,6 +2,7 @@ package gg.tropic.uhc.shared
 
 import gg.scala.cgs.common.information.CgsGameAwardInfo
 import gg.scala.cgs.common.information.CgsGameGeneralInfo
+import gg.tropic.uhc.shared.gamemode.UHCSoloGameMode
 
 /**
  * @author GrowlyX
@@ -23,5 +24,5 @@ object UHCGameInfo : CgsGameGeneralInfo(
     showTabHearts = false,
     showNameHearts = true,
     usesCustomArenaWorld = true,
-    gameModes = listOf()
+    gameModes = listOf(UHCSoloGameMode)
 )
