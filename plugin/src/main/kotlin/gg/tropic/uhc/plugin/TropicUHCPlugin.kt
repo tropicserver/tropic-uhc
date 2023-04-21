@@ -18,6 +18,7 @@ import gg.scala.commons.core.plugin.PluginDependencyComposite
 @PluginAuthor("GrowlyX")
 @PluginDependencyComposite(
     PluginDependency("scala-commons"),
-    PluginDependency("ScGameFramework")
+    PluginDependency("ScGameFramework"),
+    PluginDependency("cloudsync", soft = true)
 )
 class TropicUHCPlugin : ExtendedScalaPlugin()
