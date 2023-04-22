@@ -1,7 +1,7 @@
 package gg.tropic.uhc.plugin.services.border
 
-import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
+import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
 import org.bukkit.Location
 
 /**
@@ -12,12 +12,17 @@ import org.bukkit.Location
 object WorldBorderService
 {
     private var center: Location? = null
-    private var size: Double = 5000.0
 
-    @Configure
-    fun configure()
+    val initialSize: Double
+        get() = initialBorderSize.value.toDouble()
+
+    var currentSize = initialBorderSize
+        .value.toDouble()
+
+    fun pushSizeUpdate(size: Double)
     {
-
+        currentSize = size
+        synchronizeBukkitWorldBorder(size)
     }
 
     fun setCenter(center: Location) =
@@ -25,12 +30,7 @@ object WorldBorderService
             this.center = center
         }
 
-    fun setSize(size: Double) =
-        apply {
-            this.size = size
-        }
-
-    private fun synchronizeBukkitWorldBorder()
+    private fun synchronizeBukkitWorldBorder(size: Double)
     {
         val worldBorder = center!!.world.worldBorder
         worldBorder.setCenter(center!!.x, center!!.z)

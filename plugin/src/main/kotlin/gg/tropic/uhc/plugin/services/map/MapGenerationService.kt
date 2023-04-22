@@ -2,7 +2,6 @@ package gg.tropic.uhc.plugin.services.map
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.information.arena.CgsGameArenaHandler
-import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -26,7 +25,6 @@ import org.bukkit.event.entity.EntitySpawnEvent
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import java.io.File
 import java.io.IOException
-import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 
 /**
@@ -72,10 +70,10 @@ object MapGenerationService
         cuboid = Cuboid(
             mapWorld(),
             0, 100, 0,
-            3000, 100, -3000
+            WorldBorderService.initialSize.toInt(), 100, -WorldBorderService.initialSize.toInt()
         )
 
-        plugin.logger.info("Loading chunks for world from (0, 100, 0) -> (3000, 100, -3000)")
+        plugin.logger.info("Loading chunks for world from (0, 100, 0) -> (${WorldBorderService.initialSize.toInt()}, 100, -${WorldBorderService.initialSize.toInt()})")
 
         val w = cuboid.world
         val x1 = cuboid.lowerX and -0x10
@@ -106,8 +104,8 @@ object MapGenerationService
 
     fun generateScatterLocation(): Location
     {
-        val randomX = (0..3000).random()
-        val randomZ = (-3000..0).random()
+        val randomX = (0..WorldBorderService.initialSize.toInt()).random()
+        val randomZ = (-WorldBorderService.initialSize.toInt()..0).random()
 
         return Location(
             mapWorld(),
@@ -232,13 +230,10 @@ object MapGenerationService
         uhcNether.time = 0
         uhcNether.pvp = false
 
-        val size = 3000
-
         generating = false
 
         WorldBorderService
             .setCenter(uhcWorld.spawnLocation)
-            .setSize(size.toDouble())
 
         // internal world/arena configuration for CGS services
         CgsGameArenaHandler.world = uhcWorld
