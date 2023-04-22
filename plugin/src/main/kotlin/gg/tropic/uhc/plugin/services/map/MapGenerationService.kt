@@ -85,31 +85,23 @@ object MapGenerationService
 
         var x3 = x1
 
-        var chunksLoadComplete = false
-
         thread {
-            while (!chunksLoadComplete)
-            {
-                plugin.logger.info("Percent complete: ${w.loadedChunks.size / 36000}%")
-                plugin.logger.info("Loaded chunks: ${"%,.2f".format(w.loadedChunks.size.toFloat())}")
-                sleep(2000)
+            while (x3 <= x2) {
+                var z3 = z1
+                while (z3 <= z2) {
+                    val shift = x3 shr 4
+                    val shift2 = z3 shr 4
+
+                    w.getChunkAtAsync(shift, shift2) {
+
+                    }
+
+                    z3 += 16
+                }
+
+                x3 += 16
             }
         }
-
-        while (x3 <= x2) {
-            var z3 = z1
-            while (z3 <= z2) {
-                val shift = x3 shr 4
-                val shift2 = z3 shr 4
-                w.loadChunk(shift, shift2)
-                z3 += 16
-            }
-
-            x3 += 16
-        }
-
-        plugin.logger.info("Finished loading chunks")
-        chunksLoadComplete = true
     }
 
     fun generateScatterLocation(): Location
