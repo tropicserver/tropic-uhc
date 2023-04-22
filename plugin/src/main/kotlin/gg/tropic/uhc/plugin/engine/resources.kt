@@ -83,6 +83,15 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                 lines += "Border: ${CC.GOLD}500 ${CC.GRAY}(50m)"
             }
 
+            CgsGameState.ENDED ->
+            {
+                lines += "${CC.GREEN}Congrats to ${CC.BOLD}Your Mother"
+                lines += "${CC.GREEN}for winning this UHC"
+                lines += "${CC.GREEN}game!"
+                lines += ""
+                lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
+            }
+
             else ->
             {
             }
