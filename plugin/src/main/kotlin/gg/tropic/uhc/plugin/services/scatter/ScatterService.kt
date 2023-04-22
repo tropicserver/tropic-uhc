@@ -7,6 +7,7 @@ import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.services.configurate.starterFood
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
@@ -14,7 +15,10 @@ import me.lucko.helper.Schedulers
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerDropItemEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 
 /**
@@ -45,11 +49,24 @@ object ScatterService
     fun configure()
     {
         Events
+            .subscribe(PlayerDropItemEvent::class.java)
+            .filter {
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING
+            }
+            .handler {
+                it.isCancelled = true
+            }
+            .bindWith(plugin)
+
+        Events
             .subscribe(CgsGameEngine.CgsGameStartEvent::class.java)
             .handler {
-                playersScattered.forEach {
-                    unsitPlayer(it)
-                }
+                Bukkit.setWhitelist(false)
+
+                playersScattered
+                    .forEach {
+                        unsitPlayer(it)
+                    }
 
                 Bukkit.broadcastMessage("$prefix${CC.GRAY}This gamemode is currently in BETA!")
                 Bukkit.broadcastMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
@@ -110,6 +127,13 @@ object ScatterService
         resetAttributes()
         teleport(MapGenerationService.generateScatterLocation())
         sitPlayer(player = this)
+
+        if (starterFood.value != 0)
+        {
+            inventory.addItem(
+                ItemStack(Material.COOKED_BEEF, starterFood.value)
+            )
+        }
 
         setMetadata(
             "scattered",

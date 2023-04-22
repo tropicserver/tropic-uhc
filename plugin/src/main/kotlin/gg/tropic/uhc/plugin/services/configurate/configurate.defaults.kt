@@ -30,7 +30,7 @@ val absorption = configurable(
     "Absorption",
     ItemStack(Material.GOLDEN_CARROT),
     "Should Absorption be enabled when data eat golden apples?",
-    1
+    true
 )
 
 val borderShrink = configurable(

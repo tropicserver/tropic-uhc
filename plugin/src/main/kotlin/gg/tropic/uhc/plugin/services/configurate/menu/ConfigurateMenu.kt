@@ -49,7 +49,7 @@ class ConfigurateMenu : PaginatedMenu()
                         .addToLore(
                             "",
                             "${CC.WHITE}Current value: ${CC.GOLD}${it.value}",
-                            "${CC.WHITE}Default value: ${it.defaultValue}",
+                            "${CC.WHITE}Default value: ${CC.GOLD}${it.defaultValue}",
                         )
                         .apply {
                             if (player.hasPermission("uhc.configurate"))

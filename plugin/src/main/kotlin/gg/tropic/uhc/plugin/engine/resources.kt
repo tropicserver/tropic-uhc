@@ -66,7 +66,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
             CgsGameState.STARTED ->
             {
                 lines += "Game time: ${CC.GOLD}${
-                    TimeUtil.formatIntoMMSS((CgsGameEngine.INSTANCE.gameStart / 1000).toInt())
+                    TimeUtil.formatIntoMMSS(((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt())
                 }"
                 lines += "Remaining: ${CC.GOLD}${
                     remainingPlayers.size
@@ -86,10 +86,10 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
             CgsGameState.ENDED ->
             {
                 lines += "${CC.GREEN}Congrats to ${CC.BOLD}Your Mother"
-                lines += "${CC.GREEN}for winning this UHC"
-                lines += "${CC.GREEN}game!"
+                lines += "${CC.GREEN}for winning this UHC game!"
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
+                lines += "${CC.WHITE}Participants: ${CC.RED}${ScatterService.gameFillCount}"
             }
 
             else ->
