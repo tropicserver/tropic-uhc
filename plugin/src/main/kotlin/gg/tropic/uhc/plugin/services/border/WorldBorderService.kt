@@ -44,6 +44,8 @@ object WorldBorderService
         worldBorder.size = size
     }
 
+    private const val BOUND_OFFSET = 5.5
+
     fun ensurePlayersWithinBorderBounds(border: Int)
     {
         Players.all()
@@ -59,30 +61,34 @@ object WorldBorderService
 
                 if (location.x < minimum)
                 {
-                    location.x = minimum + 2.5
+                    location.x = minimum + BOUND_OFFSET
                     locationModified = true
                 }
 
                 if (location.x > maximum)
                 {
-                    location.x = maximum - 2.5
+                    location.x = maximum - BOUND_OFFSET
                     locationModified = true
                 }
 
                 if (location.z < minimum)
                 {
-                    location.z = minimum + 2.5
+                    location.z = minimum + BOUND_OFFSET
                     locationModified = true
                 }
 
                 if (location.z > maximum)
                 {
-                    location.z = maximum - 2.5
+                    location.z = maximum - BOUND_OFFSET
                     locationModified = true
                 }
 
                 if (locationModified)
                 {
+                    location.y = location.world
+                        .getHighestBlockYAt(location)
+                        .toDouble()
+
                     it.teleport(location)
                     playBorderBoundTeleportationEffects(it)
                 }
