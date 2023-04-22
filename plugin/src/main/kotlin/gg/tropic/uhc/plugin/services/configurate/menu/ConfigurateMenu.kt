@@ -112,6 +112,7 @@ class ConfigurateMenu : PaginatedMenu()
                                     .acceptInput { number ->
                                         it.valueInternal = number.toInt()
                                         player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+                                        player.sendMessage("${CC.GREEN}${it.name}${CC.SEC} set to: ${CC.PRI}${number.toInt()}")
 
                                         openMenu(player)
                                     }
