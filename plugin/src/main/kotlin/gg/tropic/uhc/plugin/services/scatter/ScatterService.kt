@@ -15,6 +15,8 @@ import gg.tropic.uhc.plugin.services.configurate.starterFood
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.map.mapNetherWorld
 import gg.tropic.uhc.plugin.services.map.mapWorld
+import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
+import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -73,6 +75,12 @@ object ScatterService
                 playersScattered
                     .forEach {
                         unsitPlayer(it)
+
+                        it.profile.apply {
+                            limDiamond = 0
+                            limGold = 0
+                            limIron = 0
+                        }
                     }
 
                 Bukkit.broadcastMessage("$prefix${CC.GRAY}This gamemode is currently in BETA!")
@@ -80,6 +88,14 @@ object ScatterService
                 Bukkit.broadcastMessage("$prefix${CC.GOLD}Our rules are posted at ${CC.BOLD}tropic.gg/uhc/rules${CC.GOLD}, please acknowledge them.")
 
                 BorderUpdateEventExecutor.start()
+
+                GameScenarioService.scenarios
+                    .filterValues { it.enabled }
+                    .forEach {
+                        it.value.configure()
+                        plugin.server.pluginManager
+                            .registerEvents(it.value, plugin)
+                    }
 
                 createRunner(
                     (finalHeal.value * 60) + 1,

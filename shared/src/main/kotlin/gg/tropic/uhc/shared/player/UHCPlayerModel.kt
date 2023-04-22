@@ -12,14 +12,18 @@ import java.util.*
  */
 class UHCPlayerModel(uniqueId: UUID) : GameSpecificStatistics(uniqueId)
 {
-    private val goldenApples = CgsGameStatistic()
-    private val goldenHeads = CgsGameStatistic()
-    private val diamondsMined = CgsGameStatistic()
-    private val goldMined = CgsGameStatistic()
-    private val ironMined = CgsGameStatistic()
-    private val redstoneMined = CgsGameStatistic()
-    private val lapisMined = CgsGameStatistic()
-    private val coalMined = CgsGameStatistic()
+    val goldenApples = CgsGameStatistic()
+    val goldenHeads = CgsGameStatistic()
+    val diamondsMined = CgsGameStatistic()
+    val goldMined = CgsGameStatistic()
+    val ironMined = CgsGameStatistic()
+    val redstoneMined = CgsGameStatistic()
+    val lapisMined = CgsGameStatistic()
+    val coalMined = CgsGameStatistic()
+
+    var limGold = 0
+    var limDiamond = 0
+    var limIron = 0
 
     override fun save() = DataStoreObjectControllerCache
         .findNotNull<UHCPlayerModel>()
