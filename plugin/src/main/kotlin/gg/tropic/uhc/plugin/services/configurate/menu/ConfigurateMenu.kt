@@ -30,6 +30,7 @@ class ConfigurateMenu : PaginatedMenu()
     init
     {
         placeholdBorders = true
+        updateAfterClick = true
     }
 
     override fun size(buttons: Map<Int, Button>) = 36
@@ -53,6 +54,7 @@ class ConfigurateMenu : PaginatedMenu()
                         .apply {
                             if (it.acceptedValues.isNotEmpty())
                             {
+                                addToLore("")
                                 addToLore("${CC.WHITE}Current value:")
 
                                 it.acceptedValues.forEach { value ->
@@ -92,7 +94,7 @@ class ConfigurateMenu : PaginatedMenu()
                             if (it.acceptedValues.isNotEmpty())
                             {
                                 val index = it.acceptedValues.indexOf(it.value)
-                                val newValue = it.acceptedValues
+                                val newValue = it.acceptedValues.toList()
                                     .getOrNull(index + 1)
                                     ?: it.acceptedValues.first()
 

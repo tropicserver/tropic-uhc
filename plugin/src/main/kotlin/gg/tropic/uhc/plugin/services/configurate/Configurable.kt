@@ -12,7 +12,7 @@ data class Configurable<V : Any>(
     val item: ItemStack,
     var valueInternal: Any,
     val defaultValue: V = valueInternal as V,
-    val acceptedValues: List<V> = emptyList()
+    val acceptedValues: Set<V> = emptySet()
 )
 {
     val value: V

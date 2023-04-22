@@ -17,8 +17,7 @@ inline fun <reified V : Any> configurable(
     vararg acceptedValues: V
 ) = Configurable(
     name, description, item, value,
-    acceptedValues = acceptedValues
-        .toMutableList()
+    acceptedValues = mutableSetOf<V>()
         .apply {
             if (acceptedValues.isEmpty())
             {
@@ -26,6 +25,7 @@ inline fun <reified V : Any> configurable(
             }
 
             add(value)
+            addAll(acceptedValues.toList())
         }
 ).apply {
     configurables.add(this)

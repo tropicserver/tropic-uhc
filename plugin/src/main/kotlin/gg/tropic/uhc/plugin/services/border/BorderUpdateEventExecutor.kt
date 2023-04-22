@@ -1,7 +1,9 @@
 package gg.tropic.uhc.plugin.services.border
 
 import gg.scala.lemon.util.task.DiminutionRunnable
+import gg.tropic.uhc.plugin.services.configurate.borderDecreaseAmount
 import gg.tropic.uhc.plugin.services.configurate.borderShrink
+import gg.tropic.uhc.plugin.services.configurate.firstShrink
 import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
 import net.evilblock.cubed.util.CC
@@ -27,7 +29,7 @@ object BorderUpdateEventExecutor
     fun start()
     {
         val runnable = BorderUpdateRunnable(
-            borderShrink.value * 60,
+            firstShrink.value * 60,
             getNextBorder()
         )
 
@@ -47,7 +49,7 @@ object BorderUpdateEventExecutor
 
     fun getNextBorder() = if (WorldBorderService.currentSize > 100)
     {
-        (WorldBorderService.currentSize - 100).toInt()
+        (WorldBorderService.currentSize - borderDecreaseAmount.value).toInt()
     } else
     {
         if (WorldBorderService.currentSize > 10)
