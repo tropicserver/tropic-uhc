@@ -3,8 +3,8 @@ package gg.tropic.uhc.plugin.services.border
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
 import gg.tropic.uhc.plugin.services.map.mapWorld
-import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
-import org.bukkit.ChatColor
+import me.lucko.helper.utils.Players
+import net.evilblock.cubed.util.CC
 import org.bukkit.Effect
 import org.bukkit.Location
 import org.bukkit.Sound
@@ -28,7 +28,7 @@ object WorldBorderService
     fun pushSizeUpdate(size: Double)
     {
         currentSize = size
-        handlePlayers(border = size.toInt())
+        ensurePlayersWithinBorderBounds(border = size.toInt())
         synchronizeBukkitWorldBorder(size)
     }
 
@@ -44,140 +44,55 @@ object WorldBorderService
         worldBorder.size = size
     }
 
-    fun handlePlayers(border: Int)
+    fun ensurePlayersWithinBorderBounds(border: Int)
     {
-        val world = mapWorld()
+        Players.all()
+            .filter {
+                it.world.name == mapWorld().name
+            }
+            .forEach {
+                val maximum = border / 2
+                val minimum = -(maximum)
 
-        for (player in remainingPlayers)
-        {
-            if (player.world.name == "uhc_world")
-            {
-                if (player.location.blockX > border)
+                val location = it.location.clone()
+                var locationModified = false
+
+                if (location.x < minimum)
                 {
-                    handleEffects(player)
-                    player.teleport(
-                        Location(
-                            world,
-                            (border - 2).toDouble(), player.location.blockY.toDouble(),
-                            player.location.blockZ.toDouble()
-                        )
-                    )
-                    if (player.location.blockY < world.getHighestBlockYAt(
-                            player.location.blockX,
-                            player.location.blockZ
-                        )
-                    )
-                    {
-                        player.teleport(
-                            Location(
-                                world,
-                                player.location.blockX.toDouble(),
-                                (world.getHighestBlockYAt(
-                                    player.location.blockX,
-                                    player.location.blockZ
-                                ) + 2).toDouble(),
-                                player.location.blockZ.toDouble()
-                            )
-                        )
-                    }
+                    location.x = minimum + 2.5
+                    locationModified = true
                 }
-                if (player.location.blockZ > border)
+
+                if (location.x > maximum)
                 {
-                    handleEffects(player)
-                    player.teleport(
-                        Location(
-                            world,
-                            player.location.blockX.toDouble(),
-                            player.location.blockY.toDouble(),
-                            (border - 2).toDouble()
-                        )
-                    )
-                    if (player.location.blockY < world.getHighestBlockYAt(
-                            player.location.blockX,
-                            player.location.blockZ
-                        )
-                    )
-                    {
-                        player.teleport(
-                            Location(
-                                world,
-                                player.location.blockX.toDouble(),
-                                (world.getHighestBlockYAt(
-                                    player.location.blockX,
-                                    player.location.blockZ
-                                ) + 2).toDouble(),
-                                player.location.blockZ.toDouble()
-                            )
-                        )
-                    }
+                    location.x = maximum - 2.5
+                    locationModified = true
                 }
-                if (player.location.blockX < -border)
+
+                if (location.z < minimum)
                 {
-                    handleEffects(player)
-                    player.teleport(
-                        Location(
-                            world,
-                            (-border + 2).toDouble(), player.location.blockY.toDouble(),
-                            player.location.blockZ.toDouble()
-                        )
-                    )
-                    if (player.location.blockY < world.getHighestBlockYAt(
-                            player.location.blockX,
-                            player.location.blockZ
-                        )
-                    )
-                    {
-                        player.teleport(
-                            Location(
-                                world,
-                                player.location.blockX.toDouble(),
-                                (world.getHighestBlockYAt(
-                                    player.location.blockX,
-                                    player.location.blockZ
-                                ) + 2).toDouble(),
-                                player.location.blockZ.toDouble()
-                            )
-                        )
-                    }
+                    location.z = minimum + 2.5
+                    locationModified = true
                 }
-                if (player.location.blockZ < -border)
+
+                if (location.z > maximum)
                 {
-                    handleEffects(player)
-                    player.teleport(
-                        Location(
-                            world,
-                            player.location.blockX.toDouble(),
-                            player.location.blockY.toDouble(),
-                            (-border + 2).toDouble()
-                        )
-                    )
-                    if (player.location.blockY < world.getHighestBlockYAt(
-                            player.location.blockX,
-                            player.location.blockZ
-                        )
-                    )
-                    {
-                        player.teleport(
-                            Location(
-                                world,
-                                player.location.blockX.toDouble(),
-                                (world.getHighestBlockYAt(
-                                    player.location.blockX,
-                                    player.location.blockZ
-                                ) + 2).toDouble(),
-                                player.location.blockZ.toDouble()
-                            )
-                        )
-                    }
+                    location.z = maximum - 2.5
+                    locationModified = true
+                }
+
+                if (locationModified)
+                {
+                    it.teleport(location)
+                    playBorderBoundTeleportationEffects(it)
                 }
             }
-        }
     }
 
-    private fun handleEffects(player: Player)
+    private fun playBorderBoundTeleportationEffects(player: Player)
     {
         player.world.playEffect(player.location, Effect.LARGE_SMOKE, 2, 2)
         player.playSound(player.location, Sound.EXPLODE, 1.0f, 2.0f)
-        player.sendMessage(ChatColor.RED.toString() + "You've been teleported to a valid location inside the world border.")
+        player.sendMessage("${CC.RED}You've been teleported to a valid location inside the world border.")
     }
 }
