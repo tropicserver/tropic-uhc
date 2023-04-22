@@ -125,7 +125,6 @@ object MapGenerationService
             WorldCreator("uhc_world")
                 .environment(World.Environment.NORMAL)
                 .type(WorldType.NORMAL)
-                /*.generator("TerrainControl")*/
         )
 
         uhcWorld.setGameRuleValue("doDaylightCycle", "false")
@@ -136,7 +135,7 @@ object MapGenerationService
         uhcWorld.pvp = false
         uhcWorld.difficulty = Difficulty.NORMAL
 
-        uhcWorld.setSpawnLocation(0, 100, 0)
+        uhcWorld.setSpawnLocation(1500, 100, -1500)
 
         var waterCount = 0
         var limit = 0
