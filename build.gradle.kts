@@ -58,7 +58,7 @@ subprojects {
     }
 
     publishing {
-        repositories.configureScalaRepository(dev = true)
+        repositories.configureScalaRepository(dev = false)
 
         publications {
             register(

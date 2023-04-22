@@ -197,7 +197,8 @@ object MapGenerationService
             }
         }
 
-        if (flag && "dev" !in ServerSync.getLocalGameServer().groups)
+        // TODO: change this
+        if (flag && /*"dev" !in ServerSync.getLocalGameServer().groups*/ false)
         {
             Bukkit.getServer().unloadWorld(uhcWorld, false)
             File(Bukkit.getWorldContainer().toString() + File.separator + "uhc_world").deleteRecursively()

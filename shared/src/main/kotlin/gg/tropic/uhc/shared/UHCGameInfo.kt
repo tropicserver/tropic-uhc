@@ -26,3 +26,10 @@ object UHCGameInfo : CgsGameGeneralInfo(
     usesCustomArenaWorld = true,
     gameModes = listOf(UHCSoloGameMode)
 )
+{
+    init
+    {
+        // opposite name, ignore
+        this.requiresNoManualConfiguration = true
+    }
+}
