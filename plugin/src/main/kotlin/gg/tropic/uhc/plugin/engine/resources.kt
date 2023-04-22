@@ -12,6 +12,7 @@ import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
 import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.math.Numbers
 import net.evilblock.cubed.util.time.TimeUtil
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -52,8 +53,12 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 
             CgsGameState.STARTING ->
             {
-                lines += "${CC.GRAY}Scattering players$ellipsis"
-                lines += ""
+                if (ScatterService.playersScattered.size != ScatterService.gameFillCount)
+                {
+                    lines += "${CC.GRAY}Scattering players$ellipsis"
+                    lines += ""
+                }
+
                 lines += "${CC.GRAY}Game will be starting"
                 lines += "${CC.GRAY}in ${CC.WHITE}${
                     TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
@@ -82,7 +87,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                         .gameKills.value
                 }"
                 lines += "Border: ${CC.GOLD}${
-                    WorldBorderService.currentSize
+                    Numbers.format(WorldBorderService.currentSize.toInt())
                 }${
                     if (BorderUpdateEventExecutor.currentBorderUpdater != null)
                         " ${CC.GRAY}(${TimeUtil.formatIntoAbbreviatedString(BorderUpdateEventExecutor.currentBorderUpdater!!.seconds)})" else ""
