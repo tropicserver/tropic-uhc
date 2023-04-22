@@ -69,11 +69,10 @@ object MapGenerationService
             .bindWith(plugin)
 
         val lockFile = File(Bukkit.getWorldContainer(), "tropic.uhc.lock")
+        BiomeSwapper.swapBiomes()
 
         if (!lockFile.exists())
         {
-            BiomeSwapper.swapBiomes()
-
             deleteExistingWorld()
             createNewWorld()
 
