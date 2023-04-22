@@ -88,6 +88,7 @@ object WorldBorderService
                     location.y = location.world
                         .getHighestBlockYAt(location)
                         .toDouble()
+                    location.y = location.y + 2.0
 
                     it.teleport(location)
                     playBorderBoundTeleportationEffects(it)

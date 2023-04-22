@@ -4,6 +4,7 @@ import gg.scala.lemon.util.task.DiminutionRunnable
 import gg.tropic.uhc.plugin.services.configurate.borderDecreaseAmount
 import gg.tropic.uhc.plugin.services.configurate.borderShrink
 import gg.tropic.uhc.plugin.services.configurate.firstShrink
+import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
 import net.evilblock.cubed.util.CC
@@ -87,7 +88,7 @@ object BorderUpdateEventExecutor
         override fun onEnd()
         {
             broadcast(
-                "${CC.GREEN}The border has shrunk to ${CC.PRI}$next${CC.GREEN}."
+                "$prefix{CC.YELLOW}The border has shrunk to ${CC.PRI}$next${CC.YELLOW}!"
             )
 
             // handles border update for
