@@ -28,7 +28,7 @@ object BorderUpdateEventExecutor
     {
         val runnable = BorderUpdateRunnable(
             borderShrink.value * 60,
-            WorldBorderService.currentSize.toInt()
+            getNextBorder()
         )
 
         currentBorderUpdater = runnable
@@ -38,6 +38,17 @@ object BorderUpdateEventExecutor
                 runnable,
                 0L, 20L
             )
+    }
+
+    fun getNextBorder() = if (WorldBorderService.currentSize > 100)
+    {
+        (WorldBorderService.currentSize - 100).toInt()
+    } else
+    {
+        if (WorldBorderService.currentSize > 10)
+        {
+            oneHundredIntervals[indexForHundreds]
+        } else 10
     }
 
     fun calculateNextBorder()
@@ -69,7 +80,7 @@ object BorderUpdateEventExecutor
         override fun onEnd()
         {
             broadcast(
-                "${CC.SEC}The border has shrunk to ${CC.PRI}$next${CC.SEC}."
+                "${CC.GREEN}The border has shrunk to ${CC.PRI}$next${CC.GREEN}."
             )
 
             // handles border update for
@@ -81,11 +92,11 @@ object BorderUpdateEventExecutor
 
             // checks if this runnable is not
             // handling the last border update
-            if (WorldBorderService.currentSize.toInt() != next)
+            if (next != 10)
             {
                 currentBorderUpdater = BorderUpdateRunnable(
                     borderShrink.value * 60,
-                    WorldBorderService.currentSize.toInt()
+                    getNextBorder()
                 )
 
                 currentUpdateTask?.closeAndReportException()

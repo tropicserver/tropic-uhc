@@ -5,6 +5,7 @@ import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
+import gg.scala.lemon.util.task.DiminutionRunnable
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
@@ -105,4 +106,22 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
         lines += ""
         lines += "${CC.GRAY}tropic.gg $footerPadding"
     }
+}
+
+fun createRunner(
+    seconds: Int,
+    end: () -> Unit,
+    update: (Int) -> Unit
+) = object : DiminutionRunnable(seconds + 1)
+{
+    override fun getSeconds() = listOf(
+        18000, 14400, 10800, 7200, 3600, 2700, 1800,
+        900, 600, 300, 240, 180, 120, 60, 50, 40, 30,
+        15, 10, 5, 4, 3, 2, 1
+    )
+
+    override fun onEnd() = end()
+    override fun onRun() = update(this.seconds)
+}.apply {
+    runTaskTimer(CgsGameEngine.INSTANCE.plugin, 0L, 20L)
 }

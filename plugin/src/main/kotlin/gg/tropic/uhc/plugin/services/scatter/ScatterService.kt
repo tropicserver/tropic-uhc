@@ -7,14 +7,20 @@ import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.engine.createRunner
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
+import gg.tropic.uhc.plugin.services.configurate.finalHeal
+import gg.tropic.uhc.plugin.services.configurate.gracePeriod
 import gg.tropic.uhc.plugin.services.configurate.starterFood
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
+import gg.tropic.uhc.plugin.services.map.mapNetherWorld
+import gg.tropic.uhc.plugin.services.map.mapWorld
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
+import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -74,6 +80,37 @@ object ScatterService
                 Bukkit.broadcastMessage("$prefix${CC.GOLD}Our rules are posted at ${CC.BOLD}tropic.gg/uhc/rules${CC.GOLD}, please acknowledge them.")
 
                 BorderUpdateEventExecutor.start()
+
+                createRunner(
+                    (finalHeal.value * 60) + 1,
+                    {
+                        remainingPlayers.forEach {
+                            it.health = it.maxHealth
+                        }
+
+                        Bukkit.broadcastMessage("${CC.GREEN}Final heal has occurred! ${CC.BOLD}Good luck!")
+                    },
+                    {
+                        Bukkit.broadcastMessage("${CC.SEC}Final heal occurs in ${CC.PRI}${
+                            DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
+                        }${CC.SEC}.")
+                    }
+                )
+
+                createRunner(
+                    (gracePeriod.value * 60) + 1,
+                    {
+                        mapWorld().pvp = true
+                        mapNetherWorld().pvp = true
+
+                        Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! You can now PvP others. ${CC.BOLD}Good luck!")
+                    },
+                    {
+                        Bukkit.broadcastMessage("${CC.SEC}Grace Period ends in ${CC.PRI}${
+                            DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
+                        }${CC.SEC}.")
+                    }
+                )
             }
             .bindWith(plugin)
 
