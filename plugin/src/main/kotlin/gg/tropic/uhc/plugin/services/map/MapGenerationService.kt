@@ -67,12 +67,6 @@ object MapGenerationService
         deleteExistingWorld()
         createNewWorld()
 
-        cuboid = Cuboid(
-            mapWorld(),
-            0, 100, 0,
-            WorldBorderService.initialSize.toInt(), 100, -WorldBorderService.initialSize.toInt()
-        )
-
         plugin.logger.info("Loading chunks for world from (0, 100, 0) -> (${WorldBorderService.initialSize.toInt()}, 100, -${WorldBorderService.initialSize.toInt()})")
 
         val w = cuboid.world
@@ -104,8 +98,9 @@ object MapGenerationService
 
     fun generateScatterLocation(): Location
     {
-        val randomX = (0..WorldBorderService.initialSize.toInt()).random()
-        val randomZ = (-WorldBorderService.initialSize.toInt()..0).random()
+        val halfRange = WorldBorderService.initialSize.toInt() / 2
+        val randomX = (-halfRange..halfRange).random()
+        val randomZ = (-halfRange..halfRange).random()
 
         return Location(
             mapWorld(),
@@ -133,12 +128,22 @@ object MapGenerationService
         uhcWorld.pvp = false
         uhcWorld.difficulty = Difficulty.NORMAL
 
-        uhcWorld.setSpawnLocation(1500, 100, -1500)
+        cuboid = Cuboid(
+            mapWorld(),
+            -(WorldBorderService.initialSize.toInt() / 2), 100, -(WorldBorderService.initialSize.toInt() / 2),
+            WorldBorderService.initialSize.toInt() / 2, 100, WorldBorderService.initialSize.toInt() / 2
+        )
+
+        uhcWorld.setSpawnLocation(
+            cuboid.center.x.toInt(),
+            cuboid.center.y.toInt(),
+            cuboid.center.z.toInt()
+        )
 
         var waterCount = 0
         var limit = 0
 
-        Bukkit.getLogger().info("Loaded a new world.")
+        Bukkit.getLogger().info("Loaded a new world ${cuboid.center.x}, ${cuboid.center.y}, ${cuboid.center.z}.")
 
         var flag = false
 
@@ -194,7 +199,7 @@ object MapGenerationService
             }
         }
 
-        if (flag)
+        if (flag && false)
         {
             Bukkit.getServer().unloadWorld(uhcWorld, false)
             File(Bukkit.getWorldContainer().toString() + File.separator + "uhc_world").deleteRecursively()
@@ -232,7 +237,7 @@ object MapGenerationService
         generating = false
 
         WorldBorderService
-            .setCenter(uhcWorld.spawnLocation)
+            .setCenter(cuboid.center)
 
         // internal world/arena configuration for CGS services
         CgsGameArenaHandler.world = uhcWorld

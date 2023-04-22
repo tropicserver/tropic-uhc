@@ -21,7 +21,7 @@ object BorderUpdateEventExecutor
     var currentUpdateTask: Task? = null
     var currentBorderUpdater: BorderUpdateRunnable? = null
 
-    private val oneHundredIntervals = arrayOf(50, 25, 10)
+    private val oneHundredIntervals = arrayOf(100, 50, 25, 10)
     private var indexForHundreds = -1
 
     fun start()
@@ -30,6 +30,11 @@ object BorderUpdateEventExecutor
             borderShrink.value * 60,
             getNextBorder()
         )
+
+        WorldBorderService
+            .pushSizeUpdate(
+                WorldBorderService.currentSize
+            )
 
         currentBorderUpdater = runnable
         currentUpdateTask = Schedulers
@@ -47,7 +52,7 @@ object BorderUpdateEventExecutor
     {
         if (WorldBorderService.currentSize > 10)
         {
-            oneHundredIntervals[indexForHundreds]
+            oneHundredIntervals[indexForHundreds + 1]
         } else 10
     }
 

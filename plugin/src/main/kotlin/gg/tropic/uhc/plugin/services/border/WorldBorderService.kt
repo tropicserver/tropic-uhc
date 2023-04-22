@@ -41,9 +41,6 @@ object WorldBorderService
     {
         val worldBorder = center!!.world.worldBorder
         worldBorder.setCenter(center!!.x, center!!.z)
-
-        worldBorder.damageAmount = 0.5
-        worldBorder.damageBuffer = 3.5
         worldBorder.size = size
     }
 
