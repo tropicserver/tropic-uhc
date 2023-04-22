@@ -14,6 +14,25 @@ import org.bukkit.entity.Player
  */
 class ConfigurateMenu : PaginatedMenu()
 {
+    companion object
+    {
+        @JvmStatic
+        val slots = listOf(
+            10, 11, 12, 13, 14, 15, 16,
+            19, 20, 21, 22, 23, 24, 25
+        )
+    }
+
+    init
+    {
+        placeholdBorders = true
+    }
+
+    override fun size(buttons: Map<Int, Button>) = 36
+
+    override fun getAllPagesButtonSlots() = slots
+    override fun getMaxItemsPerPage(player: Player) = slots.size
+
     override fun getAllPagesButtons(player: Player) =
         mutableMapOf<Int, Button>().apply {
             configurables.configurables
