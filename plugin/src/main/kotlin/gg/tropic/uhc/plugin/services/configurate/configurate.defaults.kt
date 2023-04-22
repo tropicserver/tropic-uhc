@@ -44,6 +44,20 @@ object ContainerInternal
         15
     )
 
+    val initialBorderSize = configurable(
+        "Border Initial Size",
+        ItemStack(Material.SIGN),
+        "What should the initial border size be?",
+        500
+    )
+
+    val borderDecreaseAmount = configurable(
+        "Border Decrease Amount",
+        ItemStack(Material.HOPPER),
+        "How much should we decrease the border by?",
+        50
+    )
+
     val finalHeal = configurable(
         "Final Heal",
         ItemStack(Material.SPECKLED_MELON),
