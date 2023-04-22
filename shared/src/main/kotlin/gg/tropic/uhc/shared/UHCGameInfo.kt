@@ -30,6 +30,6 @@ object UHCGameInfo : CgsGameGeneralInfo(
     init
     {
         // opposite name, ignore
-        this.requiresNoManualConfiguration = true
+//        this.requiresNoManualConfiguration = true
     }
 }

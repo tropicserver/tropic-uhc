@@ -2,16 +2,20 @@ package gg.tropic.uhc.plugin.services.scatter
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
+import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
+import me.lucko.helper.Schedulers
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.metadata.FixedMetadataValue
 
 /**
  * @author GrowlyX
@@ -41,6 +45,19 @@ object ScatterService
     fun configure()
     {
         Events
+            .subscribe(CgsGameEngine.CgsGameStartEvent::class.java)
+            .handler {
+                playersScattered.forEach {
+                    unsitPlayer(it)
+                }
+
+                Bukkit.broadcastMessage("$prefix${CC.GRAY}This gamemode is currently in BETA!")
+                Bukkit.broadcastMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
+                Bukkit.broadcastMessage("$prefix${CC.GOLD}Our rules are posted at ${CC.BOLD}tropic.gg/uhc/rules${CC.GOLD}, please acknowledge them.")
+            }
+            .bindWith(plugin)
+
+        Events
             .subscribe(CgsGameEngine.CgsGamePreStartEvent::class.java)
             .handler {
                 // TODO: exclude staff and host?
@@ -53,6 +70,30 @@ object ScatterService
                 // going to convert it to 20, and add another second
                 StartingStateRunnable.PRE_START_TIME =
                     (estimatePreStartTime() / 20) + 1
+
+                Schedulers
+                    .sync()
+                    .runRepeating(
+                        { task ->
+                            if (CgsGameEngine.INSTANCE.gameState != CgsGameState.STARTING)
+                            {
+                                task.closeAndReportException()
+                                return@runRepeating
+                            }
+
+                            if (playersNotYetScattered.isEmpty())
+                            {
+                                task.closeAndReportException()
+                                return@runRepeating
+                            }
+
+                            val firstNotScattered = playersNotYetScattered.first()
+                            firstNotScattered.scatter()
+                        },
+                        // we have some leeway here, so we'll go for 4 ticks
+                        // instead of the 5 we have time for.
+                        0L, 4L
+                    )
             }
             .bindWith(plugin)
     }
@@ -66,7 +107,13 @@ object ScatterService
 
     fun Player.scatter()
     {
-        // TODO: scatter logic & player reset
-        //   ride on bat
+        resetAttributes()
+        teleport(MapGenerationService.generateScatterLocation())
+        sitPlayer(player = this)
+
+        setMetadata(
+            "scattered",
+            FixedMetadataValue(CgsGameEngine.INSTANCE.plugin, true)
+        )
     }
 }
