@@ -17,7 +17,15 @@ inline fun <reified V : Any> configurable(
     name, description, item, value,
     acceptedValues = acceptedValues
         .toMutableList()
-        .apply { add(value) }
+        .apply {
+            add(value)
+
+            if (V::class == Boolean::class)
+            {
+                // god this is wonky af
+                add((!(value as Boolean)) as V)
+            }
+        }
 ).apply {
     configurables.configurables.add(this)
 }
