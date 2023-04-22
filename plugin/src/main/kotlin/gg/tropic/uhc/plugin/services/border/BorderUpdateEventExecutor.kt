@@ -88,7 +88,7 @@ object BorderUpdateEventExecutor
         override fun onEnd()
         {
             broadcast(
-                "$prefix{CC.YELLOW}The border has shrunk to ${CC.PRI}$next${CC.YELLOW}!"
+                "$prefix${CC.YELLOW}The border has shrunk to ${CC.PRI}$next${CC.YELLOW}!"
             )
 
             // handles border update for

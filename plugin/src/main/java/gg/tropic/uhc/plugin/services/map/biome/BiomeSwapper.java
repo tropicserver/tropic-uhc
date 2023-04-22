@@ -23,7 +23,8 @@ public class BiomeSwapper {
         swapBiome(Biome.JUNGLE_EDGE, Biome.PLAINS);
         swapBiome(Biome.COLD_TAIGA, Biome.PLAINS);
         swapBiome(Biome.COLD_TAIGA_HILLS, Biome.PLAINS);
-        swapBiome(Biome.ROOFED_FOREST, Biome.PLAINS);
+        swapBiome(Biome.ROOFED_FOREST, Biome.FOREST);
+        swapBiome(Biome.ROOFED_FOREST_M, Biome.FOREST);
         swapBiome(Biome.MEGA_TAIGA_HILLS, Biome.PLAINS);
         swapBiome(Biome.MEGA_TAIGA, Biome.PLAINS);
         swapBiome(Biome.SAVANNA, Biome.FOREST);

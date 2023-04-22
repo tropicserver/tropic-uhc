@@ -9,8 +9,10 @@ import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.engine.createRunner
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
+import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.configurate.finalHeal
 import gg.tropic.uhc.plugin.services.configurate.gracePeriod
+import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
 import gg.tropic.uhc.plugin.services.configurate.menu.ConfigurateMenu
 import gg.tropic.uhc.plugin.services.configurate.starterFood
 import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
@@ -36,6 +38,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
+import java.io.File
 
 /**
  * @author GrowlyX
@@ -72,6 +75,13 @@ object ScatterService
             }
             .handler {
                 it.isCancelled = true
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(CgsGameEngine.CgsGameEndEvent::class.java)
+            .handler {
+                File(Bukkit.getWorldContainer(), "tropic.uhc.lock").delete()
             }
             .bindWith(plugin)
 
@@ -145,6 +155,8 @@ object ScatterService
                 Bukkit.broadcastMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
                 Bukkit.broadcastMessage("$prefix${CC.GOLD}Our rules are posted at ${CC.BOLD}tropic.gg/uhc/rules${CC.GOLD}, please acknowledge them.")
 
+                WorldBorderService.currentSize = initialBorderSize
+                    .value.toDouble()
                 BorderUpdateEventExecutor.start()
 
                 GameScenarioService.scenarios

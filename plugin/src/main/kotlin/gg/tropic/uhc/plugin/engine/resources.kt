@@ -5,6 +5,7 @@ import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
+import gg.scala.lemon.util.QuickAccess.username
 import gg.scala.lemon.util.task.DiminutionRunnable
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
@@ -98,7 +99,8 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 lines += "${CC.GREEN}Congrats to"
                 lines += "${CC.B_GREEN}${
-                    CgsGameEngine.INSTANCE.winningTeam.participants.first()
+                    CgsGameEngine.INSTANCE.winningTeam
+                        .participants.first().username()
                 }"
                 lines += "${CC.GREEN}for winning the game!"
                 lines += ""

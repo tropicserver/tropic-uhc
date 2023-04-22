@@ -7,6 +7,8 @@ import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
+import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
+import gg.tropic.uhc.plugin.services.map.biome.AlternativeBiomeSwapper
 import gg.tropic.uhc.plugin.services.map.biome.BiomeSwapper
 import gg.tropic.uhc.plugin.services.map.threshold.BiomeThreshold
 import gg.tropic.uhc.plugin.services.styles.prefix
@@ -26,6 +28,8 @@ import org.bukkit.event.entity.EntitySpawnEvent
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import java.io.File
 import java.io.IOException
+import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 /**
  * @author GrowlyX
@@ -69,12 +73,21 @@ object MapGenerationService
         if (!lockFile.exists())
         {
             BiomeSwapper.swapBiomes()
+
             deleteExistingWorld()
             createNewWorld()
 
             lockFile.createNewFile()
         } else
         {
+            val text = lockFile.readText()
+
+            if (text != "")
+            {
+                initialBorderSize.valueInternal = text.toInt()
+                plugin.logger.info("Loaded cached border size of $text")
+            }
+
             val uhcWorld = Bukkit.createWorld(
                 WorldCreator("uhc_world")
                     .environment(World.Environment.NORMAL)
@@ -101,13 +114,32 @@ object MapGenerationService
                 cuboid.center.z.toInt()
             )
 
+            WorldBorderService
+                .setCenter(cuboid.center)
+
+            // internal world/arena configuration for CGS services
+            CgsGameArenaHandler.world = uhcWorld
+            CgsGameArenaHandler.arena = CgsGameEngine
+                .INSTANCE.gameMode.getArenas().random()
+
+            CgsGameEngine.INSTANCE.gameArena =
+                CgsGameArenaHandler.arena
+
             plugin.logger.info("Loaded world from lock file.")
         }
 
+        // TODO: generate chunks based on config'd thing
         plugin.logger.info("Loading chunks for world from (0, 100, 0) -> (${WorldBorderService.initialSize.toInt()}, 100, -${WorldBorderService.initialSize.toInt()})")
 
-        // TODO: generate chunks based on config'd thing
-        /*val w = cuboid.world
+        thread {
+            while (generating)
+            {
+                plugin.logger.info("${mapWorld().loadedChunks.size} chunks loaded so far...")
+                sleep(2000)
+            }
+        }
+
+        val w = cuboid.world
         val x1 = cuboid.lowerX and -0x10
         val x2 = cuboid.upperX and -0x10
         val z1 = cuboid.lowerZ and -0x10
@@ -121,15 +153,15 @@ object MapGenerationService
                 val shift = x3 shr 4
                 val shift2 = z3 shr 4
 
-                w.getChunkAtAsync(shift, shift2) {
-
-                }
+                w.loadChunk(shift, shift2)
 
                 z3 += 16
             }
 
             x3 += 16
-        }*/
+        }
+
+        generating = false
     }
 
     fun generateScatterLocation(): Location
