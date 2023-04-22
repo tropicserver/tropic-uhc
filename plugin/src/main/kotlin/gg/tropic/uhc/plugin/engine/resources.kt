@@ -100,7 +100,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                 lines += "${CC.GREEN}for winning this UHC game!"
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
-                lines += "${CC.WHITE}Participants: ${CC.RED}${ScatterService.gameFillCount}"
+                lines += "${CC.WHITE}Participants: ${CC.GOLD}${ScatterService.gameFillCount}"
             }
 
             else ->
