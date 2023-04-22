@@ -23,6 +23,18 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
     )
     {
         lines += ""
+
+        when (state)
+        {
+            CgsGameState.WAITING -> {
+                lines += "${CC.GRAY}Game being prepared"
+                lines += "${CC.GRAY}while waiting for more"
+                lines += "${CC.GRAY}players$ellipsis"
+            }
+            else -> {}
+        }
+
+        lines += ""
         lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
         lines += "${CC.WHITE}Mode: ${CC.GOLD}FFA"
         lines += "${CC.WHITE}Players: ${CC.GOLD}${

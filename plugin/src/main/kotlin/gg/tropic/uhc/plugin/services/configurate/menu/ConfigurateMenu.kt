@@ -35,7 +35,7 @@ class ConfigurateMenu : PaginatedMenu()
 
     override fun getAllPagesButtons(player: Player) =
         mutableMapOf<Int, Button>().apply {
-            configurables.configurables
+            configurables
                 .forEach {
                     this[size] = ItemBuilder
                         .copyOf(it.item)

@@ -9,7 +9,11 @@ import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.shared.UHCGameInfo
 import gg.tropic.uhc.shared.gamemode.UHCSoloGameMode
 import gg.tropic.uhc.shared.player.UHCPlayerModel
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.visibility.VisibilityAction
+
+var ellipsis = "."
+var ellipsisIndex = 0
 
 /**
  * @author GrowlyX
@@ -24,6 +28,19 @@ class UHCGameEngine(
     UHCPlayerModel::class
 )
 {
+    init
+    {
+        Tasks.timer(0L, 20L) {
+            if (ellipsisIndex > 3)
+            {
+                ellipsisIndex = 1
+            }
+
+            ellipsis = ".".repeat(ellipsisIndex)
+            ellipsisIndex += 1
+        }
+    }
+
     override fun getGameSnapshot() = object : CgsGameSnapshot
     {
         override fun getExtraInformation() = emptyList<String>()
