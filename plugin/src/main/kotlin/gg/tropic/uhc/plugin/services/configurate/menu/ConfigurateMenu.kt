@@ -1,11 +1,15 @@
 package gg.tropic.uhc.plugin.services.configurate.menu
 
+import gg.tropic.uhc.plugin.services.configurate.Configurable
 import gg.tropic.uhc.plugin.services.configurate.configurables
+import gg.tropic.uhc.plugin.services.hosting.isHost
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.cubed.util.text.TextSplitter
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 
 /**
@@ -46,13 +50,25 @@ class ConfigurateMenu : PaginatedMenu()
                                 linePrefix = CC.GRAY
                             )
                         )
-                        .addToLore(
-                            "",
-                            "${CC.WHITE}Current value: ${CC.GOLD}${it.value}",
-                            "${CC.WHITE}Default value: ${CC.GOLD}${it.defaultValue}",
-                        )
                         .apply {
-                            if (player.hasPermission("uhc.configurate"))
+                            if (it.acceptedValues.isNotEmpty())
+                            {
+                                addToLore("${CC.WHITE}Current value:")
+
+                                it.acceptedValues.forEach { value ->
+                                    addToLore(
+                                        "${if (value == it.value) "${CC.GREEN}► " else CC.GRAY}$value"
+                                    )
+                                }
+                            } else
+                            {
+                                addToLore(
+                                    "",
+                                    "${CC.WHITE}Current: ${CC.GREEN}${it.value}"
+                                )
+                            }
+
+                            if (player.isHost())
                             {
                                 addToLore(
                                     "",
@@ -60,7 +76,47 @@ class ConfigurateMenu : PaginatedMenu()
                                 )
                             }
                         }
-                        .toButton()
+                        .toButton { _, _ ->
+                            if (!player.isHost())
+                            {
+                                return@toButton
+                            }
+
+                            if (it.value is Boolean)
+                            {
+                                it.valueInternal = !(it.value as Boolean)
+                                player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+                                return@toButton
+                            }
+
+                            if (it.acceptedValues.isNotEmpty())
+                            {
+                                val index = it.acceptedValues.indexOf(it.value)
+                                val newValue = it.acceptedValues
+                                    .getOrNull(index + 1)
+                                    ?: it.acceptedValues.first()
+
+                                it.valueInternal = newValue
+                                player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+                                return@toButton
+                            }
+
+                            if (it.value is Int)
+                            {
+                                player.closeInventory()
+
+                                NumberPrompt()
+                                    .withText("Enter a number:")
+                                    .acceptInput { number ->
+                                        it.valueInternal = number.toInt()
+                                        player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+
+                                        openMenu(player)
+                                    }
+                                    .start(player)
+                                return@toButton
+                            }
+                        }
                 }
         }
 

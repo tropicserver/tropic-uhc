@@ -10,7 +10,11 @@ data class Configurable<V : Any>(
     val name: String,
     val description: String,
     val item: ItemStack,
-    var value: V,
-    val defaultValue: V = value,
+    var valueInternal: Any,
+    val defaultValue: V = valueInternal as V,
     val acceptedValues: List<V> = emptyList()
 )
+{
+    val value: V
+        get() = valueInternal as V
+}

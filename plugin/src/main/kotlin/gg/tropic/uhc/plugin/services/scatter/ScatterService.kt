@@ -11,22 +11,29 @@ import gg.tropic.uhc.plugin.engine.createRunner
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
 import gg.tropic.uhc.plugin.services.configurate.finalHeal
 import gg.tropic.uhc.plugin.services.configurate.gracePeriod
+import gg.tropic.uhc.plugin.services.configurate.menu.ConfigurateMenu
 import gg.tropic.uhc.plugin.services.configurate.starterFood
+import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.map.mapNetherWorld
 import gg.tropic.uhc.plugin.services.map.mapWorld
 import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
+import gg.tropic.uhc.plugin.services.scenario.menu.ScenarioMenu
 import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.bukkit.Tasks
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerDropItemEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 
@@ -60,10 +67,61 @@ object ScatterService
         Events
             .subscribe(PlayerDropItemEvent::class.java)
             .filter {
-                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING ||
+                        CgsGameEngine.INSTANCE.gameState == CgsGameState.WAITING
             }
             .handler {
                 it.isCancelled = true
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(PlayerJoinEvent::class.java)
+            .filter {
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.WAITING
+            }
+            .handler {
+                it.player.sendMessage("$prefix${CC.GREEN}Welcome to Tropic's UHC!")
+                it.player.sendMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
+                it.player.sendMessage("$prefix${CC.WHITE}Today's game host: ${hostDisplayName()}")
+
+                Tasks.delayed(3L) {
+                    it.player.inventory.setItem(
+                        0, ItemBuilder
+                            .of(Material.BOOK)
+                            .name("${CC.GOLD}Game Config ${CC.GRAY}(Right Click)")
+                            .build()
+                    )
+
+                    it.player.inventory.setItem(
+                        1, ItemBuilder
+                            .of(Material.EYE_OF_ENDER)
+                            .name("${CC.GOLD}Scenarios ${CC.GRAY}(Right Click)")
+                            .build()
+                    )
+                    it.player.updateInventory()
+                }
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(PlayerInteractEvent::class.java)
+            .filter {
+                it.hasItem() && it.action.name.contains("RIGHT") && it.clickedBlock == null
+            }
+            .handler {
+                when (it.item!!.type)
+                {
+                    Material.BOOK ->
+                    {
+                        ConfigurateMenu().openMenu(it.player)
+                    }
+                    Material.EYE_OF_ENDER ->
+                    {
+                        ScenarioMenu().openMenu(it.player)
+                    }
+                    else -> {}
+                }
             }
             .bindWith(plugin)
 

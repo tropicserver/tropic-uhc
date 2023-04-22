@@ -20,6 +20,11 @@ inline fun <reified V : Any> configurable(
     acceptedValues = acceptedValues
         .toMutableList()
         .apply {
+            if (acceptedValues.isEmpty())
+            {
+                return@apply
+            }
+
             add(value)
         }
 ).apply {

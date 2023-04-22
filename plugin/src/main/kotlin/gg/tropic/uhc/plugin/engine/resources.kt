@@ -53,7 +53,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 
             CgsGameState.STARTING ->
             {
-                if (ScatterService.playersScattered.size != ScatterService.gameFillCount)
+                if (ScatterService.playersScattered.size < ScatterService.gameFillCount)
                 {
                     lines += "${CC.GRAY}Scattering players$ellipsis"
                     lines += ""

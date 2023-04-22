@@ -713,6 +713,7 @@ val timber = object : GameScenario(
         {
             return
         }
+
         if (event.block.type == Material.LOG || event.block.type == Material.LOG_2)
         {
             event.isCancelled = true
