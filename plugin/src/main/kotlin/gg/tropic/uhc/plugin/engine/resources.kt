@@ -5,8 +5,8 @@ import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
-import gg.scala.cgs.game.listener.CgsGameEventListener
-import gg.scala.cgs.game.listener.CgsGameGeneralListener
+import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
+import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
 import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
@@ -80,7 +80,12 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                         )
                         .gameKills.value
                 }"
-                lines += "Border: ${CC.GOLD}500 ${CC.GRAY}(50m)"
+                lines += "Border: ${CC.GOLD}${
+                    WorldBorderService.currentSize
+                }${
+                    if (BorderUpdateEventExecutor.currentBorderUpdater != null)
+                        " ${CC.GRAY}(${TimeUtil.formatIntoAbbreviatedString(BorderUpdateEventExecutor.currentBorderUpdater!!.seconds)})" else ""
+                }"
             }
 
             CgsGameState.ENDED ->

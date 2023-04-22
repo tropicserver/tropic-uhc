@@ -88,12 +88,19 @@ object BorderUpdateEventExecutor
                     WorldBorderService.currentSize.toInt()
                 )
 
+                currentUpdateTask?.closeAndReportException()
                 currentUpdateTask = Schedulers
                     .async()
                     .runRepeating(
                         currentBorderUpdater!!,
                         0L, 20L
                     )
+            } else
+            {
+                currentBorderUpdater = null
+
+                currentUpdateTask?.closeAndReportException()
+                currentUpdateTask = null
             }
         }
 
