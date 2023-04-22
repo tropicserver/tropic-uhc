@@ -193,3 +193,18 @@ val netherTime = configurable(
     "Should players be able to go to nether before 20 minutes?",
     false
 )
+
+
+val shearsRate = configurable(
+    "Apple Drop Rate",
+    ItemStack(Material.SHEARS),
+    "%age chance for apples to drop when you break leaves.",
+    1
+)
+
+val decayDropRate = configurable(
+    "Apple Leaves Drop Rate",
+    ItemStack(Material.LEAVES_2),
+    "%age chance for apples to drop when you leaves decay.",
+    3
+)
