@@ -58,7 +58,7 @@ subprojects {
     }
 
     publishing {
-        repositories.configureScalaRepository()
+        repositories.configureScalaRepository(dev = true)
 
         publications {
             register(
@@ -76,9 +76,9 @@ subprojects {
         )
 }
 
-fun RepositoryHandler.configureScalaRepository()
+fun RepositoryHandler.configureScalaRepository(dev: Boolean = false)
 {
-    maven("${property("artifactory_contextUrl")}/gradle-release") {
+    maven("${property("artifactory_contextUrl")}/gradle-${if (dev) "dev" else "release"}") {
         name = "scala"
         credentials {
             username = property("artifactory_user").toString()

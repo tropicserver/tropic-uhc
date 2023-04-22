@@ -14,7 +14,7 @@ import java.util.*
  */
 object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 {
-    private val footerPadding = "${CC.GRAY} ".repeat(8)
+    private val footerPadding = "${CC.GRAY} ".repeat(10)
 
     override fun getTitle() = "${CC.B_PRI}UHC"
 

@@ -2,24 +2,32 @@ package gg.tropic.uhc.plugin.services.map
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.information.arena.CgsGameArenaHandler
+import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.map.threshold.BiomeThreshold
+import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import org.bukkit.Bukkit
 import org.bukkit.Difficulty
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.WorldType
 import org.bukkit.block.Biome
+import org.bukkit.entity.EntityType
+import org.bukkit.event.entity.EntitySpawnEvent
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import java.io.File
 import java.io.IOException
+import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 /**
  * @author GrowlyX
@@ -32,6 +40,7 @@ object MapGenerationService
     lateinit var plugin: TropicUHCPlugin
 
     private var generating = true
+    private lateinit var cuboid: Cuboid
 
     @Configure
     fun configure()
@@ -42,13 +51,80 @@ object MapGenerationService
             .handler {
                 it.disallow(
                     AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST,
-                    "${CC.RED}The server isn't ready for players yet!"
+                    "$prefix${CC.RED}We're working on generating a world for you to play on!\n$prefix${CC.RED}Please try joining later, or contact an administrator."
                 )
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(EntitySpawnEvent::class.java)
+            .filter {
+                it.location.world.name == "lobby" && it.entityType != EntityType.PLAYER
+            }
+            .handler {
+                it.isCancelled = true
             }
             .bindWith(plugin)
 
         deleteExistingWorld()
         createNewWorld()
+
+        cuboid = Cuboid(
+            mapWorld(),
+            0, 100, 0,
+            3000, 100, -3000
+        )
+
+        plugin.logger.info("Loading chunks for world from (0, 100, 0) -> (3000, 100, -3000)")
+
+        val w = cuboid.world
+        val x1 = cuboid.lowerX and -0x10
+        val x2 = cuboid.upperX and -0x10
+        val z1 = cuboid.lowerZ and -0x10
+        val z2 = cuboid.upperZ and -0x10
+
+        var x3 = x1
+
+        var chunksLoadComplete = false
+
+        thread {
+            while (!chunksLoadComplete)
+            {
+                plugin.logger.info("Percent complete: ${w.loadedChunks.size / 36000}%")
+                plugin.logger.info("Loaded chunks: ${"%,.2f".format(w.loadedChunks.size.toFloat())}")
+                sleep(2000)
+            }
+        }
+
+        while (x3 <= x2) {
+            var z3 = z1
+            while (z3 <= z2) {
+                val shift = x3 shr 4
+                val shift2 = z3 shr 4
+                w.loadChunk(shift, shift2)
+                z3 += 16
+            }
+
+            x3 += 16
+        }
+
+        plugin.logger.info("Finished loading chunks")
+        chunksLoadComplete = true
+    }
+
+    fun generateScatterLocation(): Location
+    {
+        val randomX = (0..3000).random()
+        val randomZ = (-3000..0).random()
+
+        return Location(
+            mapWorld(),
+            randomX.toDouble(),
+            mapWorld()
+                .getHighestBlockYAt(randomX, randomZ)
+                .toDouble(),
+            randomZ.toDouble()
+        )
     }
 
     private fun createNewWorld()
@@ -129,7 +205,7 @@ object MapGenerationService
             }
         }
 
-        if (flag)
+        if (flag && "dev" !in ServerSync.getLocalGameServer().groups)
         {
             Bukkit.getServer().unloadWorld(uhcWorld, false)
             File(Bukkit.getWorldContainer().toString() + File.separator + "uhc_world").deleteRecursively()
@@ -172,9 +248,13 @@ object MapGenerationService
             .setCenter(uhcWorld.spawnLocation)
             .setSize(size.toDouble())
 
+        // internal world/arena configuration for CGS services
         CgsGameArenaHandler.world = uhcWorld
         CgsGameArenaHandler.arena = CgsGameEngine
             .INSTANCE.gameMode.getArenas().random()
+
+        CgsGameEngine.INSTANCE.gameArena =
+            CgsGameArenaHandler.arena
     }
 
     private fun deleteExistingWorld()
