@@ -7,6 +7,7 @@ import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
+import gg.tropic.uhc.plugin.services.map.biome.BiomeSwapper
 import gg.tropic.uhc.plugin.services.map.threshold.BiomeThreshold
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
@@ -25,7 +26,6 @@ import org.bukkit.event.entity.EntitySpawnEvent
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import java.io.File
 import java.io.IOException
-import kotlin.concurrent.thread
 
 /**
  * @author GrowlyX
@@ -64,12 +64,50 @@ object MapGenerationService
             }
             .bindWith(plugin)
 
-        deleteExistingWorld()
-        createNewWorld()
+        val lockFile = File(Bukkit.getWorldContainer(), "tropic.uhc.lock")
+
+        if (!lockFile.exists())
+        {
+            BiomeSwapper.swapBiomes()
+            deleteExistingWorld()
+            createNewWorld()
+
+            lockFile.createNewFile()
+        } else
+        {
+            val uhcWorld = Bukkit.createWorld(
+                WorldCreator("uhc_world")
+                    .environment(World.Environment.NORMAL)
+                    .type(WorldType.NORMAL)
+            )
+
+            uhcWorld.setGameRuleValue("doDaylightCycle", "false")
+            uhcWorld.setGameRuleValue("doFireTick", "false")
+            uhcWorld.setGameRuleValue("naturalRegeneration", "false")
+
+            uhcWorld.time = 0
+            uhcWorld.pvp = false
+            uhcWorld.difficulty = Difficulty.NORMAL
+
+            cuboid = Cuboid(
+                mapWorld(),
+                -(WorldBorderService.initialSize.toInt() / 2), 100, -(WorldBorderService.initialSize.toInt() / 2),
+                WorldBorderService.initialSize.toInt() / 2, 100, WorldBorderService.initialSize.toInt() / 2
+            )
+
+            uhcWorld.setSpawnLocation(
+                cuboid.center.x.toInt(),
+                cuboid.center.y.toInt(),
+                cuboid.center.z.toInt()
+            )
+
+            plugin.logger.info("Loaded world from lock file.")
+        }
 
         plugin.logger.info("Loading chunks for world from (0, 100, 0) -> (${WorldBorderService.initialSize.toInt()}, 100, -${WorldBorderService.initialSize.toInt()})")
 
-        val w = cuboid.world
+        // TODO: generate chunks based on config'd thing
+        /*val w = cuboid.world
         val x1 = cuboid.lowerX and -0x10
         val x2 = cuboid.upperX and -0x10
         val z1 = cuboid.lowerZ and -0x10
@@ -77,23 +115,21 @@ object MapGenerationService
 
         var x3 = x1
 
-        thread {
-            while (x3 <= x2) {
-                var z3 = z1
-                while (z3 <= z2) {
-                    val shift = x3 shr 4
-                    val shift2 = z3 shr 4
+        while (x3 <= x2) {
+            var z3 = z1
+            while (z3 <= z2) {
+                val shift = x3 shr 4
+                val shift2 = z3 shr 4
 
-                    w.getChunkAtAsync(shift, shift2) {
+                w.getChunkAtAsync(shift, shift2) {
 
-                    }
-
-                    z3 += 16
                 }
 
-                x3 += 16
+                z3 += 16
             }
-        }
+
+            x3 += 16
+        }*/
     }
 
     fun generateScatterLocation(): Location
@@ -233,8 +269,6 @@ object MapGenerationService
 
         uhcNether.time = 0
         uhcNether.pvp = false
-
-        generating = false
 
         WorldBorderService
             .setCenter(cuboid.center)

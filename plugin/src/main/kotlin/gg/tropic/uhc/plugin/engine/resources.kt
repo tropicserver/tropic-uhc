@@ -96,8 +96,11 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 
             CgsGameState.ENDED ->
             {
-                lines += "${CC.GREEN}Congrats to ${CC.BOLD}Your Mother"
-                lines += "${CC.GREEN}for winning this UHC game!"
+                lines += "${CC.GREEN}Congrats to"
+                lines += "${CC.B_GREEN}${
+                    CgsGameEngine.INSTANCE.winningTeam.participants.first()
+                }"
+                lines += "${CC.GREEN}for winning the game!"
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
                 lines += "${CC.WHITE}Participants: ${CC.GOLD}${ScatterService.gameFillCount}"
