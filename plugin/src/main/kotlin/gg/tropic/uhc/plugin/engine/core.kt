@@ -11,6 +11,7 @@ import gg.tropic.uhc.shared.gamemode.UHCSoloGameMode
 import gg.tropic.uhc.shared.player.UHCPlayerModel
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.visibility.VisibilityAction
+import org.bukkit.Bukkit
 
 var ellipsis = "."
 var ellipsisIndex = 0
@@ -55,6 +56,12 @@ class UHCGameEngine(
 
     override fun getVisibilityAdapter() = object : CgsGameVisibilityAdapter
     {
-        override fun computeVisibility(viewer: CgsGamePlayer, target: CgsGamePlayer) = VisibilityAction.NEUTRAL
+        override fun computeVisibility(viewer: CgsGamePlayer, target: CgsGamePlayer): VisibilityAction
+        {
+            if (!Bukkit.getPlayer(viewer.identifier).hasPermission("uhc.moderator"))
+                return VisibilityAction.HIDE
+
+            return VisibilityAction.NEUTRAL
+        }
     }
 }
