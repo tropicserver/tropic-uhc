@@ -1,5 +1,7 @@
 package gg.tropic.uhc.plugin.services.configurate.menu
 
+import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.states.CgsGameState
 import gg.tropic.uhc.plugin.services.configurate.Configurable
 import gg.tropic.uhc.plugin.services.configurate.configurables
 import gg.tropic.uhc.plugin.services.hosting.isHost
@@ -81,6 +83,12 @@ class ConfigurateMenu : PaginatedMenu()
                         .toButton { _, _ ->
                             if (!player.isHost())
                             {
+                                return@toButton
+                            }
+
+                            if (CgsGameEngine.INSTANCE.gameState != CgsGameState.WAITING)
+                            {
+                                player.sendMessage("${CC.RED}You cannot modify the config right now!")
                                 return@toButton
                             }
 

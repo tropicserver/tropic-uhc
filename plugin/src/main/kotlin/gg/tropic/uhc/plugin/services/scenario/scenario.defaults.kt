@@ -706,16 +706,19 @@ val timber = object : GameScenario(
     "When you break one log, it automatically breaks whole tree."
 )
 {
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun onBlockBreak(event: BlockBreakEvent)
     {
-        if (event.isCancelled || isNotPlaying(event.player))
+        if (isNotPlaying(event.player))
         {
+            println("thing-1")
             return
         }
+        println("thing")
 
         if (event.block.type == Material.LOG || event.block.type == Material.LOG_2)
         {
+            println("thing2")
             event.isCancelled = true
             var up = event.block.getRelative(BlockFace.UP)
             var down = event.block.getRelative(BlockFace.DOWN)

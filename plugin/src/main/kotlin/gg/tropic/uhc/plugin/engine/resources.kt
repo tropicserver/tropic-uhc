@@ -10,6 +10,7 @@ import gg.scala.lemon.util.task.DiminutionRunnable
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
+import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
 import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
 import net.evilblock.cubed.util.CC
@@ -39,9 +40,19 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
         {
             CgsGameState.WAITING ->
             {
-                lines += "${CC.GRAY}Game being prepared"
-                lines += "${CC.GRAY}while waiting for more"
-                lines += "${CC.GRAY}players$ellipsis"
+                if (MapGenerationService.generating)
+                {
+                    lines += "${CC.GOLD}Generating:"
+                    lines += "Progress: ${CC.GOLD}${
+                        MapGenerationService.generation?.completionStatus() ?: "0.0%"
+                    }"
+                } else
+                {
+                    lines += "${CC.GRAY}Game being prepared"
+                    lines += "${CC.GRAY}while waiting for more"
+                    lines += "${CC.GRAY}players$ellipsis"
+                }
+
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
                 lines += "${CC.WHITE}Mode: ${CC.GOLD}FFA"

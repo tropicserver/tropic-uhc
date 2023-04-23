@@ -8,11 +8,11 @@ import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
-import gg.tropic.uhc.plugin.services.map.biome.AlternativeBiomeSwapper
 import gg.tropic.uhc.plugin.services.map.biome.BiomeSwapper
 import gg.tropic.uhc.plugin.services.map.threshold.BiomeThreshold
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
+import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import org.bukkit.Bukkit
@@ -25,11 +25,8 @@ import org.bukkit.WorldType
 import org.bukkit.block.Biome
 import org.bukkit.entity.EntityType
 import org.bukkit.event.entity.EntitySpawnEvent
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import java.io.File
 import java.io.IOException
-import java.lang.Thread.sleep
-import kotlin.concurrent.thread
 
 /**
  * @author GrowlyX
@@ -41,23 +38,14 @@ object MapGenerationService
     @Inject
     lateinit var plugin: TropicUHCPlugin
 
-    private var generating = true
     private lateinit var cuboid: Cuboid
+
+    var generating = false
+    var generation: MapChunkLoadTask? = null
 
     @Configure
     fun configure()
     {
-        Events
-            .subscribe(AsyncPlayerPreLoginEvent::class.java)
-            .filter { generating }
-            .handler {
-                it.disallow(
-                    AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST,
-                    "$prefix${CC.RED}We're working on generating a world for you to play on!\n$prefix${CC.RED}Please try joining later, or contact an administrator."
-                )
-            }
-            .bindWith(plugin)
-
         Events
             .subscribe(EntitySpawnEvent::class.java)
             .filter {
@@ -69,7 +57,6 @@ object MapGenerationService
             .bindWith(plugin)
 
         val lockFile = File(Bukkit.getWorldContainer(), "tropic.uhc.lock")
-        BiomeSwapper.swapBiomes()
 
         if (!lockFile.exists())
         {
@@ -79,6 +66,7 @@ object MapGenerationService
             lockFile.createNewFile()
         } else
         {
+            BiomeSwapper.swapBiomes()
             val text = lockFile.readText()
 
             if (text != "")
@@ -113,9 +101,6 @@ object MapGenerationService
                 cuboid.center.z.toInt()
             )
 
-            WorldBorderService
-                .setCenter(cuboid.center)
-
             // internal world/arena configuration for CGS services
             CgsGameArenaHandler.world = uhcWorld
             CgsGameArenaHandler.arena = CgsGameEngine
@@ -127,40 +112,52 @@ object MapGenerationService
             plugin.logger.info("Loaded world from lock file.")
         }
 
-        // TODO: generate chunks based on config'd thing
-        plugin.logger.info("Loading chunks for world from (0, 100, 0) -> (${WorldBorderService.initialSize.toInt()}, 100, -${WorldBorderService.initialSize.toInt()})")
+        WorldBorderService
+            .setCenter(cuboid.center)
+            .pushSizeUpdate(
+                WorldBorderService.initialSize
+            )
 
-        thread {
-            while (generating)
-            {
-                plugin.logger.info("${mapWorld().loadedChunks.size} chunks loaded so far...")
-                sleep(2000)
-            }
+        startWorldRegeneration()
+    }
+
+    fun startWorldRegeneration(chunksPerRun: Int = 100)
+    {
+        val loadTask = MapChunkLoadTask(
+            Bukkit.getServer(),
+            mapWorld().name,
+            CoordXZ.chunkToBlock(13),
+            chunksPerRun,
+            5
+        )
+
+        generating = true
+        generation = loadTask
+
+        Bukkit.setWhitelist(true)
+        Bukkit.broadcastMessage(
+            "$prefix${CC.GRAY}Starting to load chunks with ${WorldBorderService.initialSize} as the border size. Whitelist is now enabled as a precaution."
+        )
+
+        loadTask.finish = Runnable {
+            generation = null
+            generating = false
+
+            Players.all()
+                .filter { it.isOp }
+                .forEach {
+                    it.sendMessage("$prefix${CC.GREEN}Completed chunk generation. The game is now ready to be started.")
+                }
         }
 
-        val w = cuboid.world
-        val x1 = cuboid.lowerX and -0x10
-        val x2 = cuboid.upperX and -0x10
-        val z1 = cuboid.lowerZ and -0x10
-        val z2 = cuboid.upperZ and -0x10
+        loadTask.cuboid = cuboid
 
-        var x3 = x1
-
-        while (x3 <= x2) {
-            var z3 = z1
-            while (z3 <= z2) {
-                val shift = x3 shr 4
-                val shift2 = z3 shr 4
-
-                w.loadChunk(shift, shift2)
-
-                z3 += 16
-            }
-
-            x3 += 16
-        }
-
-        generating = false
+        loadTask.setTaskID(
+            Bukkit.getServer().scheduler
+                .scheduleSyncRepeatingTask(
+                    plugin, loadTask, 5, 5
+                )
+        )
     }
 
     fun generateScatterLocation(): Location
@@ -276,6 +273,8 @@ object MapGenerationService
         {
             Bukkit.getLogger().info("Found a good seed (" + uhcWorld.seed + ").")
         }
+
+        BiomeSwapper.swapBiomes()
 
         // Create Lock
         val lock = File("uhc_world", "gen.lock")
