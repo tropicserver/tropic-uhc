@@ -1,5 +1,6 @@
 package gg.tropic.uhc.plugin.services.map.commands
 
+import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
 import gg.scala.commons.acf.annotation.Optional
@@ -26,6 +27,11 @@ object QueueChunkLoadCommand : ScalaCommand()
         player: ScalaPlayer, @Optional chunksPerRun: Int?
     )
     {
+        if (MapGenerationService.generating)
+        {
+            throw ConditionFailedException("The map is already generating!")
+        }
+
         player.sendMessage(
             "$prefix${CC.GREEN}Starting a chunk reload task with a chunk load freq of ${chunksPerRun ?: 100}."
         )

@@ -47,12 +47,13 @@ object MapGenerationService
     fun configure()
     {
         Events
-            .subscribe(EntitySpawnEvent::class.java)
-            .filter {
-                it.location.world.name == "lobby" && it.entityType != EntityType.PLAYER
-            }
+            .subscribe(CgsGameEngine.CgsGameForceStartEvent::class.java)
             .handler {
-                it.isCancelled = true
+                if (generating)
+                {
+                    it.isCancelled = true
+                    it.starter.sendMessage("${CC.RED}The world is currently being generated! You're unable to start the game at this time.")
+                }
             }
             .bindWith(plugin)
 
@@ -118,11 +119,16 @@ object MapGenerationService
                 WorldBorderService.initialSize
             )
 
-        startWorldRegeneration()
+        startWorldRegeneration(chunksPerRun = 200)
     }
 
     fun startWorldRegeneration(chunksPerRun: Int = 100)
     {
+        if (generating)
+        {
+            return
+        }
+
         val loadTask = MapChunkLoadTask(
             Bukkit.getServer(),
             mapWorld().name,
@@ -146,7 +152,7 @@ object MapGenerationService
             Players.all()
                 .filter { it.isOp }
                 .forEach {
-                    it.sendMessage("$prefix${CC.GREEN}Completed chunk generation. The game is now ready to be started.")
+                    it.sendMessage("$prefix${CC.GREEN}Completed chunk generation. The game is now ready to begin.")
                 }
         }
 

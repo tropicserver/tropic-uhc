@@ -1,4 +1,4 @@
-package gg.tropic.uhc.plugin.services.configurate.command
+package gg.tropic.uhc.plugin.services.configurate.commands
 
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.annotations.commands.AutoRegister
