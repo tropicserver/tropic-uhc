@@ -6,6 +6,7 @@ import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
+import gg.scala.lemon.LemonConstants
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.engine.createRunner
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
@@ -91,7 +92,7 @@ object ScatterService
                 CgsGameEngine.INSTANCE.gameState == CgsGameState.WAITING
             }
             .handler {
-                it.player.sendMessage("$prefix${CC.GREEN}Welcome to Tropic's UHC!")
+                it.player.sendMessage("$prefix${CC.GREEN}Welcome to ${LemonConstants.SERVER_NAME}'s UHC!")
                 it.player.sendMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
                 it.player.sendMessage("$prefix${CC.WHITE}Today's game host: ${hostDisplayName()}")
 
