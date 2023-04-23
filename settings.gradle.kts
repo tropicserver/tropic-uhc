@@ -1,2 +1,2 @@
 rootProject.name = "tropic-uhc"
-include("plugin", "shared")
+include("plugin", "plugin-lobby", "shared")

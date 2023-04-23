@@ -118,7 +118,8 @@ object ScatterService
         Events
             .subscribe(PlayerInteractEvent::class.java)
             .filter {
-                it.hasItem() && it.action.name.contains("RIGHT") && it.clickedBlock == null
+                it.hasItem() && it.action.name.contains("RIGHT") && it.clickedBlock == null &&
+                        CgsGameEngine.INSTANCE.gameState == CgsGameState.WAITING
             }
             .handler {
                 when (it.item!!.type)
