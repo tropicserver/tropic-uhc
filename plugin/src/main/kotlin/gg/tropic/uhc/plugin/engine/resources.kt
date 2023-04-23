@@ -14,10 +14,13 @@ import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
 import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
+import me.lucko.helper.Schedulers
+import me.lucko.helper.scheduler.Task
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.math.Numbers
 import net.evilblock.cubed.util.time.TimeUtil
 import org.bukkit.Bukkit
+import org.bukkit.Color
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -134,7 +137,7 @@ fun createRunner(
     seconds: Int,
     end: () -> Unit,
     update: (Int) -> Unit
-) = object : DiminutionRunnable(seconds + 1)
+) = object : CountdownRunnable(seconds + 1)
 {
     override fun getSeconds() = listOf(
         18000, 14400, 10800, 7200, 3600, 2700, 1800,
@@ -145,5 +148,41 @@ fun createRunner(
     override fun onEnd() = end()
     override fun onRun() = update(this.seconds)
 }.apply {
-    runTaskTimer(CgsGameEngine.INSTANCE.plugin, 0L, 20L)
+    Schedulers
+        .sync()
+        .runRepeating(
+            this, 0L, 20L
+        )
+        .let {
+            this.task = it
+        }
 }
+
+abstract class CountdownRunnable(var seconds: Int) : Runnable
+{
+    var task: Task? = null
+
+    override fun run()
+    {
+        seconds--
+
+        if (getSeconds().contains(seconds))
+        {
+            onRun()
+        } else if (seconds == 0)
+        {
+            onEnd()
+            task?.closeAndReportException()
+        }
+    }
+
+    fun broadcast(message: String)
+    {
+        Bukkit.broadcastMessage(net.evilblock.cubed.util.Color.translate(message))
+    }
+
+    abstract fun onRun()
+    abstract fun onEnd()
+    abstract fun getSeconds(): List<Int>
+}
+

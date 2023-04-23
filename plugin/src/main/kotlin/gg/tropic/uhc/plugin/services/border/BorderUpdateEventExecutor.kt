@@ -1,6 +1,7 @@
 package gg.tropic.uhc.plugin.services.border
 
 import gg.scala.lemon.util.task.DiminutionRunnable
+import gg.tropic.uhc.plugin.engine.CountdownRunnable
 import gg.tropic.uhc.plugin.services.configurate.borderDecreaseAmount
 import gg.tropic.uhc.plugin.services.configurate.borderShrink
 import gg.tropic.uhc.plugin.services.configurate.firstShrink
@@ -78,12 +79,9 @@ object BorderUpdateEventExecutor
 
     class BorderUpdateRunnable(
         seconds: Int, val next: Int
-    ) : DiminutionRunnable(seconds)
+    ) : CountdownRunnable(seconds)
     {
-        override fun getSeconds(): List<Int>
-        {
-            return broadcastIntervals
-        }
+        override fun getSeconds() = broadcastIntervals
 
         override fun onEnd()
         {
