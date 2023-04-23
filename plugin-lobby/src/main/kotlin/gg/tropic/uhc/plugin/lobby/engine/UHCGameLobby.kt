@@ -1,6 +1,7 @@
 package gg.tropic.uhc.plugin.lobby.engine
 
 import gg.scala.cgs.common.instance.CgsServerInstance
+import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.lobby.command.commands.RecentGamesCommand
 import gg.scala.cgs.lobby.gamemode.CgsGameLobby
 import gg.scala.cgs.lobby.leaderboard.CgsLobbyRankingEntry
@@ -75,12 +76,24 @@ class UHCGameLobby : CgsGameLobby<UHCPlayerModel>(UHCPlayerModel::class)
 
         override fun getLines(lines: LinkedList<String>, player: Player)
         {
+            lines += ""
             lines += "${CC.WHITE}Lobby: ${CC.GOLD}${
                 CgsGameInfoUpdater.lobbyTotalCount
             }"
             lines += "${CC.WHITE}In-Game: ${CC.GOLD}${
                 CgsGameInfoUpdater.playingTotalCount
             }"
+
+            val stats = getStatistics(
+                CgsPlayerHandler.find(player)!!
+            )
+
+            lines += ""
+            lines += "${CC.GOLD}Statistics:"
+            lines += " Kills: ${CC.GOLD}${stats.kills.value}"
+            lines += " Wins: ${CC.GOLD}${stats.wins.value}"
+            lines += " Losses: ${CC.GOLD}${stats.losses.value}"
+            lines += " Deaths: ${CC.GOLD}${stats.deaths.value}"
             lines += ""
             lines += "${CC.GRAY}${LemonConstants.WEB_LINK} $footerPadding"
         }
