@@ -4,6 +4,8 @@ import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.states.CgsGameState
 import gg.tropic.uhc.plugin.services.configurate.oresToInventory
 import gg.tropic.uhc.plugin.services.map.MapGenerationService.plugin
+import me.lucko.helper.Events
+import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.evilblock.cubed.entity.EntityHandler
 import net.evilblock.cubed.entity.hologram.updating.UpdatingHologramEntity
 import net.evilblock.cubed.util.CC
@@ -666,9 +668,23 @@ val timeBomb = object : GameScenario(
                 hologram.initializeData()
                 EntityHandler.trackEntity(hologram)
 
+                val terminable = CompositeTerminable.create()
+
+                Events
+                    .subscribe(BlockBreakEvent::class.java)
+                    .filter {
+                        it.block.location.equals(chest.location) || it.block.location.equals(secondChest.location)
+                    }
+                    .handler {
+                        it.isCancelled = true
+                    }
+                    .bindWith(terminable)
+
                 Bukkit.getScheduler().runTaskLater(plugin, {
                     hologram.destroyForCurrentWatchers()
                     EntityHandler.forgetEntity(hologram)
+
+                    terminable.closeAndReportException()
 
                     where.world.spigot().strikeLightning(where, true)
                     where.world.createExplosion(where, 8f)
