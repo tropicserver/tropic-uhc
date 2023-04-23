@@ -3,13 +3,20 @@ package gg.tropic.uhc.plugin.services.scenario
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.states.CgsGameState
 import gg.tropic.uhc.plugin.services.configurate.oresToInventory
+import gg.tropic.uhc.plugin.services.map.MapGenerationService.plugin
+import net.evilblock.cubed.entity.EntityHandler
+import net.evilblock.cubed.entity.hologram.updating.UpdatingHologramEntity
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import org.apache.commons.lang.time.DurationFormatUtils
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.Chest
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.entity.Player
@@ -21,6 +28,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -589,6 +597,114 @@ val goldenRetriever = object : GameScenario(
         if (CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTED)
         {
             event.drops.add(goldenHead())
+        }
+    }
+}
+
+val timeBomb = object : GameScenario(
+    "Time Bomb",
+    ItemStack(Material.TNT),
+    "When a player dies, their loot will drop into a chest. After 30s, the chest will explode."
+)
+{
+    @EventHandler
+    fun onEntityExplode(event: EntityExplodeEvent)
+    {
+        event.blockList().removeIf { block: Block -> block.type == Material.BEDROCK }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onDeathEvent(event: PlayerDeathEvent)
+    {
+        handleTimeBomb(event.entity, event.drops, listOf())
+    }
+
+    fun handleTimeBomb(
+        entity: Entity,
+        drops: MutableList<ItemStack?>?,
+        items: List<ItemStack?>
+    )
+    {
+        drops?.clear()
+        val where = entity.location
+        where.block.type = Material.CHEST
+        val chest = where.block.state as Chest
+        where.add(1.0, 0.0, 0.0).block.type = Material.CHEST
+        where.add(0.0, 1.0, 0.0).block.type = Material.AIR
+        where.add(1.0, 1.0, 0.0).block.type = Material.AIR
+        val secondChest: Chest
+        secondChest = try
+        {
+            chest.location.add(1.0, 0.0, 0.0).block.state as Chest
+        } catch (e: Exception)
+        {
+            chest
+        }
+        if (entity is Player)
+        {
+            val player = entity
+            val killer = player.killer
+
+            if (killer != null)
+            {
+                val explosionTime = System.currentTimeMillis() + 1000L * 20
+                val hologram = object : UpdatingHologramEntity(
+                    text = "${CC.GREEN}${entity.name}'s corpse",
+                    location = chest.location.clone().add(1.0, 1.8, 0.5)
+                )
+                {
+                    override fun getNewLines() = listOf(
+                        "${CC.GREEN}${entity.name}'s corpse",
+                        "${CC.SEC}Explodes in ${CC.PRI}${
+                            DurationFormatUtils.formatDurationWords(explosionTime - System.currentTimeMillis(), true, true)
+                        }"
+                    )
+
+                    override fun getTickInterval() = 15L
+                }
+
+                hologram.initializeData()
+                EntityHandler.trackEntity(hologram)
+
+                Bukkit.getScheduler().runTaskLater(plugin, {
+                    hologram.destroyForCurrentWatchers()
+                    EntityHandler.forgetEntity(hologram)
+
+                    where.world.spigot().strikeLightning(where, true)
+                    where.world.createExplosion(where, 8f)
+
+                    Bukkit.broadcastMessage("${CC.GREEN}${entity.name}'s${CC.SEC} corpse exploded!")
+                }, 30L * 20)
+            }
+        }
+
+        // Should never happend but yea
+        items.stream().filter { stack: ItemStack? -> stack != null && stack.type != Material.AIR }
+            .forEach { stack: ItemStack? ->
+                chest.inventory.addItem(stack)
+            }
+
+        // always adding 1 head
+        chest.inventory.addItem(goldenHead())
+        if (goldenRetriever.enabled)
+        {
+            chest.inventory.addItem(goldenHead())
+        }
+        if (diamondless.enabled)
+        {
+            chest.inventory.addItem(ItemStack(Material.DIAMOND, 1))
+        }
+        if (goldless.enabled)
+        {
+            chest.inventory.addItem(ItemStack(Material.GOLD_INGOT, 8))
+            chest.inventory.addItem(goldenHead())
+        }
+        if (bareBones.enabled)
+        {
+            chest.inventory.addItem(ItemStack(Material.GOLDEN_APPLE))
+            chest.inventory.addItem(ItemStack(Material.DIAMOND))
+            chest.inventory.addItem(ItemStack(Material.ARROW, 32))
+            chest.inventory.addItem(ItemStack(Material.STRING, 2))
         }
     }
 }

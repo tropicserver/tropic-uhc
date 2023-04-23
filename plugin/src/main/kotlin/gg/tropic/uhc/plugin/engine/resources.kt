@@ -5,6 +5,7 @@ import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
+import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.util.QuickAccess.username
 import gg.scala.lemon.util.task.DiminutionRunnable
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
@@ -42,8 +43,8 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 if (MapGenerationService.generating)
                 {
-                    lines += "${CC.GOLD}Generating:"
-                    lines += "Progress: ${CC.GOLD}${
+                    lines += "${CC.PRI}Generating:"
+                    lines += "Progress: ${CC.PRI}${
                         MapGenerationService.generation?.completionStatus() ?: "0.0%"
                     }"
                 } else
@@ -55,8 +56,8 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
-                lines += "${CC.WHITE}Mode: ${CC.GOLD}FFA"
-                lines += "${CC.WHITE}Players: ${CC.GOLD}${
+                lines += "${CC.WHITE}Mode: ${CC.PRI}FFA"
+                lines += "${CC.WHITE}Players: ${CC.PRI}${
                     Bukkit.getOnlinePlayers().size
                 }/${
                     Bukkit.getMaxPlayers()
@@ -77,28 +78,28 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                 }${CC.GRAY}"
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
-                lines += "${CC.WHITE}Mode: ${CC.GOLD}FFA"
+                lines += "${CC.WHITE}Mode: ${CC.PRI}FFA"
                 lines += "${CC.WHITE}Scattered: ${CC.GOLD}${ScatterService.playersScattered.size}/${ScatterService.gameFillCount}"
             }
 
             CgsGameState.STARTED ->
             {
-                lines += "Game time: ${CC.GOLD}${
+                lines += "Game time: ${CC.PRI}${
                     TimeUtil.formatIntoMMSS(((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt())
                 }"
-                lines += "Remaining: ${CC.GOLD}${
+                lines += "Remaining: ${CC.PRI}${
                     remainingPlayers.size
                 }/${
                     ScatterService.gameFillCount
                 }"
-                lines += "Kills: ${CC.GOLD}${
+                lines += "Kills: ${CC.PRI}${
                     CgsGameEngine.INSTANCE
                         .getStatistics(
                             CgsPlayerHandler.find(player)!!
                         )
                         .gameKills.value
                 }"
-                lines += "Border: ${CC.GOLD}${
+                lines += "Border: ${CC.PRI}${
                     Numbers.format(WorldBorderService.currentSize.toInt())
                 }${
                     if (BorderUpdateEventExecutor.currentBorderUpdater != null)
@@ -125,7 +126,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
         }
 
         lines += ""
-        lines += "${CC.GRAY}tropic.gg $footerPadding"
+        lines += "${CC.GRAY}${LemonConstants.WEB_LINK} $footerPadding"
     }
 }
 
