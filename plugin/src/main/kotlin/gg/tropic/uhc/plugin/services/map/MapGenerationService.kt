@@ -27,8 +27,6 @@ import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.WorldType
 import org.bukkit.block.Biome
-import org.bukkit.entity.EntityType
-import org.bukkit.event.entity.EntitySpawnEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import java.io.File
 import java.io.IOException
@@ -153,8 +151,8 @@ object MapGenerationService
 
         spectatorCuboid = Cuboid(
             mapWorld(),
-            -50, 100, -50,
-            50, 100, 50
+            -50, 0, -50,
+            50, 256, 50
         )
 
         CgsGameSpectateMenu.filter = {

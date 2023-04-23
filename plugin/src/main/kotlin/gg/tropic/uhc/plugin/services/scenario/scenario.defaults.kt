@@ -841,7 +841,7 @@ val timber = object : GameScenario(
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onBlockBreak(event: BlockBreakEvent)
     {
-        if (event.isCancelled || isNotPlaying(event.player))
+        if (isNotPlaying(event.player))
         {
             return
         }

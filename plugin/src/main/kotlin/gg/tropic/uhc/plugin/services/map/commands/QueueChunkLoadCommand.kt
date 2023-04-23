@@ -9,12 +9,11 @@ import gg.scala.commons.acf.annotation.Optional
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
+import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.styles.prefix
 import net.evilblock.cubed.util.CC
-import org.bukkit.Bukkit
-import java.io.File
 
 /**
  * @author GrowlyX
@@ -42,6 +41,11 @@ object QueueChunkLoadCommand : ScalaCommand()
         player.sendMessage(
             "$prefix${CC.GREEN}Starting a chunk reload task with a chunk load freq of ${chunksPerRun ?: 100}."
         )
+        
+        WorldBorderService
+            .pushSizeUpdate(
+                initialBorderSize.value.toDouble()
+            )
 
         MapGenerationService
             .startWorldRegeneration(
