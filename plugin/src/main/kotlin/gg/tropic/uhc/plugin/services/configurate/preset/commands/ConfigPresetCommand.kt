@@ -22,7 +22,7 @@ import net.evilblock.cubed.util.CC
  * @since 4/23/2023
  */
 @AutoRegister
-@CommandAlias("preset")
+@CommandAlias("preset|presets")
 @CommandPermission("uhc.command.preset")
 object ConfigPresetCommand : ScalaCommand()
 {
@@ -34,7 +34,7 @@ object ConfigPresetCommand : ScalaCommand()
     }
 
     @AssignPermission
-    @Subcommand("build")
+    @Subcommand("view")
     @Description("Apply existing presets to the current game.")
     fun onApply(player: ScalaPlayer)
     {
