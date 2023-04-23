@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
  * @since 4/22/2023
  */
 val Player.playing: Boolean
-    get() = hasMetadata("spectator")
+    get() = !hasMetadata("spectator")
 
 val Player.profile: UHCPlayerModel
     get() = CgsGameEngine.INSTANCE
