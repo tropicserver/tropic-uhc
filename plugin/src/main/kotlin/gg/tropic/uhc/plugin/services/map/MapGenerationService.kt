@@ -113,6 +113,18 @@ object MapGenerationService
             plugin.logger.info("Loaded world from lock file.")
         }
 
+        val uhcNether = Bukkit.createWorld(
+            WorldCreator("uhc_nether")
+                .environment(World.Environment.NETHER)
+                .type(WorldType.NORMAL)
+        )
+
+        uhcNether.setGameRuleValue("doDaylightCycle", "false")
+        uhcNether.setGameRuleValue("naturalRegeneration", "false")
+
+        uhcNether.time = 0
+        uhcNether.pvp = false
+
         WorldBorderService
             .setCenter(cuboid.center)
             .pushSizeUpdate(
@@ -293,18 +305,6 @@ object MapGenerationService
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "stop")
             return
         }
-
-        val uhcNether = Bukkit.createWorld(
-            WorldCreator("uhc_nether")
-                .environment(World.Environment.NETHER)
-                .type(WorldType.NORMAL)
-        )
-
-        uhcNether.setGameRuleValue("doDaylightCycle", "false")
-        uhcNether.setGameRuleValue("naturalRegeneration", "false")
-
-        uhcNether.time = 0
-        uhcNether.pvp = false
 
         WorldBorderService
             .setCenter(cuboid.center)
