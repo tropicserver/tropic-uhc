@@ -131,7 +131,7 @@ object MapGenerationService
                 WorldBorderService.initialSize
             )
 
-        startWorldRegeneration(chunksPerRun = 200)
+        startWorldRegeneration()
     }
 
     fun startWorldRegeneration(chunksPerRun: Int = 100)
@@ -146,7 +146,7 @@ object MapGenerationService
             mapWorld().name,
             CoordXZ.chunkToBlock(13),
             chunksPerRun,
-            5
+            3
         )
 
         generating = true
