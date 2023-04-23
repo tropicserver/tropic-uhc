@@ -95,6 +95,13 @@ val firstShrink = configurable(
     60
 )
 
+val firstShrinkAmount = configurable(
+    "First Shrink Amount",
+    ItemStack(Material.BOOK_AND_QUILL),
+    "How much should the border shrink initially?",
+    250
+)
+
 val godApples = configurable(
     "God Apples",
     ItemStack(Material.GOLDEN_APPLE, 1, 1.toShort()),

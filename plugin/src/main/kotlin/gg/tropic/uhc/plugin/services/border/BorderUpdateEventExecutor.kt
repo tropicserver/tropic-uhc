@@ -4,6 +4,7 @@ import gg.tropic.uhc.plugin.engine.CountdownRunnable
 import gg.tropic.uhc.plugin.services.configurate.borderDecreaseAmount
 import gg.tropic.uhc.plugin.services.configurate.borderShrink
 import gg.tropic.uhc.plugin.services.configurate.firstShrink
+import gg.tropic.uhc.plugin.services.configurate.firstShrinkAmount
 import gg.tropic.uhc.plugin.services.configurate.flatMeetup
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Schedulers
@@ -28,11 +29,13 @@ object BorderUpdateEventExecutor
     private val oneHundredIntervals = arrayOf(100, 50, 25, 10)
     private var indexForHundreds = -1
 
+    private var initialDecrease = false
+
     fun start()
     {
         val runnable = BorderUpdateRunnable(
             firstShrink.value * 60,
-            getNextBorder()
+            firstShrinkAmount.value
         )
 
         WorldBorderService
@@ -56,15 +59,22 @@ object BorderUpdateEventExecutor
     {
         if (WorldBorderService.currentSize > 10)
         {
-            oneHundredIntervals[indexForHundreds + 1]
+            oneHundredIntervals[indexForHundreds]
         } else 10
     }
 
     fun calculateNextBorder()
     {
+        if (!initialDecrease)
+        {
+            initialDecrease = true
+            WorldBorderService.currentSize -= firstShrinkAmount.value
+            return
+        }
+
         if (WorldBorderService.currentSize > 100)
         {
-            WorldBorderService.currentSize -= 100
+            WorldBorderService.currentSize -= borderDecreaseAmount.value
         } else
         {
             if (WorldBorderService.currentSize > 10)

@@ -32,7 +32,6 @@ subprojects {
         compileOnly("gg.scala.spigot:server:1.1.0")
 
         compileOnly("gg.scala.lemon:bukkit:1.6.2")
-        compileOnly("gg.scala.cgs:common:1.2.1")
     }
 
     kotlin {
