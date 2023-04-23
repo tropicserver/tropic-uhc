@@ -731,7 +731,7 @@ val timber = object : GameScenario(
                     if (up.type == Material.LOG || up.type == Material.LOG_2)
                     {
                         up.drops.clear()
-                        event.player.inventory.addItem(ItemStack(Material.LOG))
+                        event.player.inventory.addItem(ItemStack(Material.LOG, 1, up.data.toShort()))
                         up.type = Material.AIR
                     }
                 }
@@ -747,7 +747,7 @@ val timber = object : GameScenario(
                     if (down.type == Material.LOG || down.type == Material.LOG_2)
                     {
                         down.drops.clear()
-                        event.player.inventory.addItem(ItemStack(Material.LOG))
+                        event.player.inventory.addItem(ItemStack(Material.LOG, 1, down.data.toShort()))
                         down.type = Material.AIR
                     }
                 }
