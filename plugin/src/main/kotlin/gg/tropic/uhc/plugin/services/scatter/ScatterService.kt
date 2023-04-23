@@ -149,6 +149,14 @@ object ScatterService
                             limDiamond = 0
                             limGold = 0
                             limIron = 0
+
+                            ironMined.reset()
+                            lapisMined.reset()
+                            redstoneMined.reset()
+                            spawnersMined.reset()
+                            coalMined.reset()
+                            diamondsMined.reset()
+                            goldMined.reset()
                         }
                     }
 

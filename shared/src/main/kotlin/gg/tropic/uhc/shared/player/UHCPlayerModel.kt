@@ -12,12 +12,11 @@ import java.util.*
  */
 class UHCPlayerModel(uniqueId: UUID) : GameSpecificStatistics(uniqueId)
 {
-    val goldenApples = CgsGameStatistic()
-    val goldenHeads = CgsGameStatistic()
     val diamondsMined = CgsGameStatistic()
     val goldMined = CgsGameStatistic()
     val ironMined = CgsGameStatistic()
     val redstoneMined = CgsGameStatistic()
+    val spawnersMined = CgsGameStatistic()
     val lapisMined = CgsGameStatistic()
     val coalMined = CgsGameStatistic()
 

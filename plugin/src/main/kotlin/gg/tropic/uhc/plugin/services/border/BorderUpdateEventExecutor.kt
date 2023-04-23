@@ -1,15 +1,19 @@
 package gg.tropic.uhc.plugin.services.border
 
-import gg.scala.lemon.util.task.DiminutionRunnable
 import gg.tropic.uhc.plugin.engine.CountdownRunnable
 import gg.tropic.uhc.plugin.services.configurate.borderDecreaseAmount
 import gg.tropic.uhc.plugin.services.configurate.borderShrink
 import gg.tropic.uhc.plugin.services.configurate.firstShrink
+import gg.tropic.uhc.plugin.services.configurate.flatMeetup
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.time.TimeUtil
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.entity.Player
 
 /**
  * @author GrowlyX
@@ -98,7 +102,7 @@ object BorderUpdateEventExecutor
 
             // checks if this runnable is not
             // handling the last border update
-            if (next != 10)
+            if (next != (if (flatMeetup.value) 25 else 10))
             {
                 currentBorderUpdater = BorderUpdateRunnable(
                     borderShrink.value * 60,
@@ -118,6 +122,11 @@ object BorderUpdateEventExecutor
 
                 currentUpdateTask?.closeAndReportException()
                 currentUpdateTask = null
+
+                if (flatMeetup.value)
+                {
+                    WorldBorderService.flatZone(25)
+                }
             }
         }
 

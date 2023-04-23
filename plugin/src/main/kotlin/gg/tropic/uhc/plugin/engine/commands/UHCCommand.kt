@@ -12,9 +12,11 @@ import gg.scala.commons.annotations.commands.AssignPermission
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
-import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
-import org.bukkit.Bukkit
-import java.io.File
+import gg.scala.flavor.inject.Inject
+import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.services.styles.prefix
+import net.evilblock.cubed.util.CC
+import org.bukkit.metadata.FixedMetadataValue
 
 /**
  * @author GrowlyX
@@ -25,6 +27,9 @@ import java.io.File
 @CommandPermission("uhc.command.uhc")
 object UHCCommand : ScalaCommand()
 {
+    @Inject
+    lateinit var plugin: TropicUHCPlugin
+
     @Default
     @HelpCommand
     fun onHelp(help: CommandHelp)
@@ -37,4 +42,19 @@ object UHCCommand : ScalaCommand()
     @Description("Start the UHC game with your current configuration & scenarios.")
     fun onStart(player: ScalaPlayer) = ForceStartCommand
         .onForceStart(player.bukkit())
+
+    @AssignPermission
+    @Subcommand("xray-alerts")
+    @Description("Enable X-Ray alerts.")
+    fun onXRayAlerts(player: ScalaPlayer)
+    {
+        player.bukkit().setMetadata(
+            "xray-alerts",
+            FixedMetadataValue(plugin, true)
+        )
+
+        player.sendMessage(
+            "$prefix${CC.GREEN}You've enabled X-Ray alerts."
+        )
+    }
 }

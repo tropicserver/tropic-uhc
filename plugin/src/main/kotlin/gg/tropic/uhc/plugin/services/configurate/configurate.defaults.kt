@@ -155,6 +155,13 @@ val speedPotions = configurable(
     true
 )
 
+val strengthPotions = configurable(
+    "Strength Potions",
+    ItemStack(Material.POTION, 1, 8201.toShort()),
+    "Should players be able to brew strength potions at all?",
+    true
+)
+
 val starterFood = configurable(
     "Starter Food",
     ItemStack(Material.COOKED_BEEF),
@@ -186,14 +193,6 @@ val oresToInventory = configurable(
     "Should ores go to player inventory?",
     false
 )
-
-val netherTime = configurable(
-    "Nether Time",
-    ItemStack(Material.NETHER_FENCE),
-    "Should players be able to go to nether before 20 minutes?",
-    false
-)
-
 
 val shearsRate = configurable(
     "Apple Drop Rate",

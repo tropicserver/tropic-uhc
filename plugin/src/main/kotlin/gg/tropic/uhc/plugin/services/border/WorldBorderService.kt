@@ -5,8 +5,10 @@ import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
 import gg.tropic.uhc.plugin.services.map.mapWorld
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
+import org.bukkit.Bukkit
 import org.bukkit.Effect
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 
@@ -96,10 +98,77 @@ object WorldBorderService
             }
     }
 
+    fun flatZone(size: Int)
+    {
+        for (x in -size until size)
+        {
+            for (y in 59..149)
+            {
+                for (z in -size until size)
+                {
+                    Location(
+                        Bukkit.getWorld("uhc_world"),
+                        x.toDouble(),
+                        y.toDouble(),
+                        z.toDouble()
+                    ).block.type =
+                        Material.AIR
+                }
+            }
+        }
+
+        for (x in -size until size)
+        {
+            for (y in 59..59)
+            {
+                for (z in -size until size)
+                {
+                    Location(
+                        Bukkit.getWorld("uhc_world"),
+                        x.toDouble(),
+                        y.toDouble(),
+                        z.toDouble()
+                    ).block.type =
+                        Material.BEDROCK
+                }
+            }
+        }
+        for (x in -size until size)
+        {
+            for (y in 60..60)
+            {
+                for (z in -size until size)
+                {
+                    Location(
+                        Bukkit.getWorld("uhc_world"),
+                        x.toDouble(),
+                        y.toDouble(),
+                        z.toDouble()
+                    ).block.type =
+                        Material.GRASS
+                }
+            }
+        }
+
+        Bukkit.getOnlinePlayers().forEach { player: Player? ->
+            val location = player!!.location
+            player!!.teleport(
+                Location(
+                    location.world,
+                    location.x,
+                    location.world.getHighestBlockYAt(location.blockX, location.blockZ).toDouble(),
+                    location.z,
+                    location.yaw,
+                    location.pitch
+                )
+            )
+        }
+    }
+
     private fun playBorderBoundTeleportationEffects(player: Player)
     {
         player.world.playEffect(player.location, Effect.LARGE_SMOKE, 2, 2)
-        player.playSound(player.location, Sound.EXPLODE, 1.0f, 2.0f)
+        player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 0.5f)
         player.sendMessage("${CC.RED}You've been teleported to a valid location inside the world border.")
     }
 }

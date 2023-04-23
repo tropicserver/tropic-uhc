@@ -6,21 +6,35 @@ import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.services.border.WorldBorderService
+import gg.tropic.uhc.plugin.services.map.mapWorld
 import gg.tropic.uhc.plugin.services.scenario.playing
+import gg.tropic.uhc.plugin.services.scenario.profile
 import me.lucko.helper.Events
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.FancyMessage
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
+import net.md_5.bungee.api.chat.ClickEvent
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.LeavesDecayEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.inventory.CraftItemEvent
+import org.bukkit.event.player.PlayerBucketEmptyEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerPortalEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+
 
 /**
  * @author GrowlyX
@@ -36,11 +50,118 @@ object ConfigurateService
     fun configure()
     {
         Events
+            .subscribe(PlayerInteractEvent::class.java)
+            .handler { event ->
+                val player = event.player
+                val stack = player.itemInHand
+
+                if (stack.type == Material.POTION)
+                {
+                    if (!invisibilityPotions.value)
+                    {
+                        when (stack.durability.toInt())
+                        {
+                            16462, 16430, 8270, 8238 ->
+                            {
+                                event.isCancelled = true
+                                event.player
+                                    .sendMessage("${CC.RED}Invis pots are disabled this game!")
+                                event.player.itemInHand.durability = 0.toShort()
+                            }
+                        }
+                    }
+
+                    if (!speedPotions.value)
+                    {
+                        when (stack.durability.toInt())
+                        {
+                            16450, 16418, 16386, 8258, 8226, 8194 ->
+                            {
+                                event.isCancelled = true
+                                event.player
+                                    .sendMessage("${CC.RED}Speed pots are disabled this game!")
+                                event.player.itemInHand.durability = 0.toShort()
+                            }
+                        }
+                    }
+
+                    if (!strengthPotions.value)
+                    {
+                        when (stack.durability.toInt())
+                        {
+                            16457, 16425, 16393, 8265, 8233, 8201 ->
+                            {
+                                event.isCancelled = true
+                                event.player
+                                    .sendMessage("${CC.RED}Strength pots are disabled this game!")
+                                stack.durability = 0.toShort()
+                            }
+                        }
+                    }
+                }
+
+                if (!iPvP.value)
+                {
+                    if (event.action !== Action.RIGHT_CLICK_BLOCK || event.item == null || event.item
+                            .type !== Material.FLINT_AND_STEEL || mapWorld().pvp
+                    )
+                    {
+                        return@handler
+                    }
+
+                    event.player
+                        .getNearbyEntities(5.0, 5.0, 5.0)
+                        .filterIsInstance<Player>()
+                        .forEach { _ ->
+                            event.isCancelled = true
+                            event.player
+                                .sendMessage("${CC.RED}iPvP is not allowed this game!")
+                        }
+                }
+            }
+            .bindWith(plugin)
+
+        Events
             .subscribe(PlayerPortalEvent::class.java)
             .filter { !nether.value }
             .handler {
                 it.isCancelled = true
                 it.player.sendMessage("${CC.RED}Nether is disabled during this game!")
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(EntityDamageEvent::class.java)
+            .filter { !iPvP.value }
+            .handler { event ->
+                if (
+                    event.entity is Player &&
+                    event.cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION &&
+                    !mapWorld().pvp
+                )
+                {
+                    event.entity.sendMessage("${CC.RED}iPvP is not allowed this game!")
+                    event.isCancelled = true
+                }
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(PlayerBucketEmptyEvent::class.java)
+            .filter { !iPvP.value }
+            .handler { event ->
+                if (!mapWorld().pvp)
+                {
+                    event.player.getNearbyEntities(5.0, 5.0, 5.0)
+                        .filterIsInstance<Player>()
+                        .forEach { _ ->
+                            if (event.bucket == Material.LAVA_BUCKET)
+                            {
+                                event.isCancelled = true
+                                event.player.sendMessage("${CC.RED}iPvP is not allowed this game!")
+                            }
+                        }
+                }
             }
             .bindWith(plugin)
 
@@ -98,6 +219,133 @@ object ConfigurateService
                 it.isCancelled = true
                 it.player.noDamageTicks = 1
                 it.player.teleport(it.to)
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(PlayerItemConsumeEvent::class.java)
+            .handler {
+                if (it.isCancelled)
+                {
+                    return@handler
+                }
+
+                if (it.item == null || it.item.type !== Material.GOLDEN_APPLE || it.item
+                        .itemMeta == null || !it.item.itemMeta.hasDisplayName()
+                    || !it.item.itemMeta.displayName.equals(CC.GOLD + "Golden Head", true)
+                )
+                {
+                    return@handler
+                }
+
+                it.player.removePotionEffect(PotionEffectType.REGENERATION)
+                it.player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 200, 1))
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(PlayerPortalEvent::class.java)
+            .handler { event ->
+                if (event.isCancelled)
+                {
+                    return@handler
+                }
+
+                val player: Player = event.player
+
+                if (!nether.value || ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000L) < gracePeriod.value * 60)
+                {
+                    event.isCancelled = true
+                    player.sendMessage(if (nether.value) "${CC.RED}Nether is disabled this game!" else CC.RED + "You can enter nether after ${gracePeriod.value} minutes.")
+                    return@handler
+                }
+
+                if (WorldBorderService.currentSize <= 500)
+                {
+                    event.isCancelled = true
+                    player.sendMessage(CC.RED + "You cannot enter nether while the border is under 500.")
+                    return@handler
+                }
+
+                if (!event.isCancelled && event.cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL)
+                {
+                    event.portalTravelAgent.setSearchRadius(32)
+
+                    if (event.from.world.name.equals("uhc_world", ignoreCase = true))
+                    {
+                        val x = player.location.x / 8.0
+                        val y = player.location.y
+                        val z = player.location.z / 8.0
+                        event.to =
+                            event.portalTravelAgent.findOrCreate(Location(Bukkit.getWorld("uhc_nether"), x, y, z))
+                    } else if (event.from.world.name.equals("uhc_nether", ignoreCase = true))
+                    {
+                        val x = player.location.x * 8.0
+                        val y = player.location.y
+                        val z = player.location.z * 8.0
+                        event.to = event.portalTravelAgent.findOrCreate(Location(Bukkit.getWorld("uhc_world"), x, y, z))
+                    }
+                }
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(BlockBreakEvent::class.java)
+            .handler { event ->
+                if (!event.isCancelled)
+                {
+                    val profile = event.player.profile
+
+                    if (event.player.playing)
+                    {
+                        when (event.block.type)
+                        {
+                            Material.DIAMOND_ORE -> profile.diamondsMined.inc()
+                            Material.GOLD_ORE -> profile.goldMined.inc()
+                            Material.COAL_ORE -> profile.coalMined.inc()
+                            Material.IRON_ORE -> profile.ironMined.inc()
+                            Material.REDSTONE_ORE -> profile.redstoneMined.inc()
+                            Material.MOB_SPAWNER -> profile.spawnersMined.inc()
+                            Material.LAPIS_ORE -> profile.lapisMined.inc()
+
+                            else ->
+                            {
+                            }
+                        }
+                    }
+
+                    if (
+                        Bukkit.getOnlinePlayers().size < 350 ||
+                        event.player.gameMode != GameMode.CREATIVE
+                    )
+                    {
+                        when (event.block.type)
+                        {
+                            Material.MOB_SPAWNER, Material.DIAMOND_ORE -> for (p in Bukkit.getOnlinePlayers())
+                            {
+                                if (!p.playing && p.hasPermission("uhc.xray-alerts") && p.hasMetadata("xray-alerts"))
+                                {
+                                    FancyMessage()
+                                        .withMessage(
+                                            (((((((CC.GRAY + "[" + CC.B_RED).toString() + "⚠" + CC.GRAY).toString() + "] "
+                                                    + event.player.displayName
+                                                    + CC.GRAY).toString() + " found " + CC.RESET
+                                                    ).toString() + (if (event.block.type == Material.DIAMOND_ORE) "Diamond Ore" else "Mob Spawner")
+                                                    + CC.GRAY).toString() + ". " + CC.RED).toString() + "(" + if (event.block.type == Material.DIAMOND_ORE) profile.diamondsMined.value else profile.spawnersMined.value
+                                                    ).toString() + ")"
+                                        )
+                                        .andHoverOf("${CC.GREEN}Click to tp!")
+                                        .andCommandOf(ClickEvent.Action.RUN_COMMAND, "/tp ${event.player.name}")
+                                        .sendToPlayer(p)
+                                }
+                            }
+
+                            else ->
+                            {
+                            }
+                        }
+                    }
+                }
             }
             .bindWith(plugin)
 
