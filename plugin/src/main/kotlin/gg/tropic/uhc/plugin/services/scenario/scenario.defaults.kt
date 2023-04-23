@@ -709,16 +709,13 @@ val timber = object : GameScenario(
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onBlockBreak(event: BlockBreakEvent)
     {
-        if (isNotPlaying(event.player))
+        if (event.isCancelled || isNotPlaying(event.player))
         {
-            println("thing-1")
             return
         }
-        println("thing")
 
         if (event.block.type == Material.LOG || event.block.type == Material.LOG_2)
         {
-            println("thing2")
             event.isCancelled = true
             var up = event.block.getRelative(BlockFace.UP)
             var down = event.block.getRelative(BlockFace.DOWN)
