@@ -57,7 +57,7 @@ class ConfigurationPresetMenu : PaginatedMenu()
                                 "${CC.GRAY}Scenarios:"
                             )
 
-                            if (preset.scenariosEnabled.isNotEmpty())
+                            if (preset.scenariosEnabled.isEmpty())
                             {
                                 addToLore("${CC.RED}None!")
                             } else
