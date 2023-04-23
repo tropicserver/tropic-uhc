@@ -39,8 +39,11 @@ object UHCSoloGameMode : CgsGameMode
         )
 
         override fun getSpectatorLocation() = Location(
-            Bukkit.getWorld("uhc_world"), 0.5,
-            Bukkit.getWorld("uhc_world").getHighestBlockYAt(0, 0) + 15.0, 0.5
+            Bukkit.getWorld("uhc_world"),
+            0.5,
+            Bukkit.getWorld("uhc_world")
+                .getHighestBlockYAt(0, 0) + 15.0,
+            0.5
         )
     }
 

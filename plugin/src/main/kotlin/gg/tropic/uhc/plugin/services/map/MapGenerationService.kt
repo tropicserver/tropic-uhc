@@ -2,18 +2,22 @@ package gg.tropic.uhc.plugin.services.map
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.information.arena.CgsGameArenaHandler
+import gg.scala.cgs.common.menu.CgsGameSpectateMenu
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
+import gg.tropic.uhc.plugin.services.hosting.isHost
 import gg.tropic.uhc.plugin.services.map.biome.BiomeSwapper
 import gg.tropic.uhc.plugin.services.map.threshold.BiomeThreshold
+import gg.tropic.uhc.plugin.services.scenario.playing
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import org.bukkit.Bukkit
 import org.bukkit.Difficulty
@@ -25,6 +29,7 @@ import org.bukkit.WorldType
 import org.bukkit.block.Biome
 import org.bukkit.entity.EntityType
 import org.bukkit.event.entity.EntitySpawnEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import java.io.File
 import java.io.IOException
 
@@ -39,6 +44,7 @@ object MapGenerationService
     lateinit var plugin: TropicUHCPlugin
 
     private lateinit var cuboid: Cuboid
+    private lateinit var spectatorCuboid: Cuboid
 
     var generating = false
     var generation: MapChunkLoadTask? = null
@@ -131,7 +137,48 @@ object MapGenerationService
                 WorldBorderService.initialSize
             )
 
+        configureSpectatorBounds()
         startWorldRegeneration()
+    }
+
+    private fun configureSpectatorBounds()
+    {
+        val specLocation = Location(
+            Bukkit.getWorld("uhc_world"),
+            0.5,
+            Bukkit.getWorld("uhc_world")
+                .getHighestBlockYAt(0, 0) + 15.0,
+            0.0
+        )
+
+        spectatorCuboid = Cuboid(
+            mapWorld(),
+            -50, 100, -50,
+            50, 100, 50
+        )
+
+        CgsGameSpectateMenu.filter = {
+            spectatorCuboid.contains(it)
+        }
+
+        Events
+            .subscribe(PlayerMoveEvent::class.java)
+            .filter(EventUtils::hasPlayerMoved)
+            .filter {
+                !it.player.playing && (it.player.isHost() || it.player.hasPermission("uhc.moderator"))
+            }
+            .handler {
+                if (!spectatorCuboid.contains(it.to))
+                {
+                    it.isCancelled = true
+
+                    it.player.teleport(specLocation)
+                    it.player.sendMessage(
+                        "${CC.RED}Woah! You went too far out of the spectator zone!"
+                    )
+                }
+            }
+            .bindWith(plugin)
     }
 
     fun startWorldRegeneration(chunksPerRun: Int = 100)
