@@ -7,9 +7,11 @@ import gg.tropic.uhc.plugin.services.configurate.configurables
 import gg.tropic.uhc.plugin.services.configurate.preset.ConfigurationPresetService
 import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
 import net.evilblock.cubed.menu.Button
+import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.bukkit.Tasks
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
@@ -70,10 +72,30 @@ class ConfigurationPresetMenu : PaginatedMenu()
 
                             addToLore(
                                 "",
-                                "${CC.GREEN}Click to apply!"
+                                "${CC.GREEN}Left-Click to apply!",
+                                "${CC.RED}Right-Click to delete!"
                             )
                         }
-                        .toButton { _, _ ->
+                        .toButton { _, type ->
+                            if (type!!.isRightClick)
+                            {
+                                ConfirmMenu("Confirm") {
+                                    if (it)
+                                    {
+                                        val cached = ConfigurationPresetService.cached()
+                                        cached.presets.remove(preset.name)
+
+                                        ConfigurationPresetService.sync(cached)
+                                        player.sendMessage("${CC.RED}You deleted the ${preset.name} preset!")
+
+                                        Tasks.delayed(1L) {
+                                            openMenu(player)
+                                        }
+                                    }
+                                }.openMenu(player)
+                                return@toButton
+                            }
+
                             if (CgsGameEngine.INSTANCE.gameState != CgsGameState.WAITING)
                             {
                                 player.sendMessage("${CC.RED}You cannot apply presets at this time!")

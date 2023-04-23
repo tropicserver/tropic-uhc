@@ -34,7 +34,7 @@ object ConfigPresetCommand : ScalaCommand()
     }
 
     @AssignPermission
-    @Subcommand("view")
+    @Subcommand("apply")
     @Description("Apply existing presets to the current game.")
     fun onApply(player: ScalaPlayer)
     {
@@ -54,6 +54,8 @@ object ConfigPresetCommand : ScalaCommand()
         val cached = ConfigurationPresetService.cached()
         cached.presets[name] = ConfigurationPresetService
             .buildPresetFromCurrentSetup(name)
+
+        ConfigurationPresetService.sync(cached)
 
         player.sendMessage(
             "$prefix${CC.GREEN}A new preset with the name $name has been created!",
