@@ -1,5 +1,7 @@
 package gg.tropic.uhc.plugin.services.map.commands
 
+import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
@@ -22,7 +24,7 @@ import java.io.File
 object QueueChunkLoadCommand : ScalaCommand()
 {
     @CommandAlias("queue-chunk-reload")
-    @CommandPermission("op")
+    @CommandPermission("uhc.command.regen")
     fun onQueueChunkLoad(
         player: ScalaPlayer, @Optional chunksPerRun: Int?
     )
@@ -30,6 +32,11 @@ object QueueChunkLoadCommand : ScalaCommand()
         if (MapGenerationService.generating)
         {
             throw ConditionFailedException("The map is already generating!")
+        }
+
+        if (CgsGameEngine.INSTANCE.gameState != CgsGameState.WAITING)
+        {
+            throw ConditionFailedException("You cannot regen at this time!")
         }
 
         player.sendMessage(
