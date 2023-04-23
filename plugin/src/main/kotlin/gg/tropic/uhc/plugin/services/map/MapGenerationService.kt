@@ -28,6 +28,7 @@ import org.bukkit.WorldCreator
 import org.bukkit.WorldType
 import org.bukkit.block.Biome
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import java.io.File
 import java.io.IOException
 
@@ -159,7 +160,7 @@ object MapGenerationService
             .subscribe(PlayerMoveEvent::class.java)
             .filter(EventUtils::hasPlayerMoved)
             .filter {
-                !it.player.playing && (it.player.isHost() || it.player.hasPermission("uhc.moderator"))
+                !it.player.playing && !it.player.hasPermission("uhc.moderator")
             }
             .handler {
                 if (!spectatorCuboid.contains(it.to))
@@ -173,6 +174,23 @@ object MapGenerationService
                 }
             }
             .bindWith(plugin)
+
+        Events
+            .subscribe(PlayerTeleportEvent::class.java)
+            .filter {
+                !it.player.playing && !it.player.hasPermission("uhc.moderator")
+            }
+            .handler {
+                if (!spectatorCuboid.contains(it.to))
+                {
+                    it.isCancelled = true
+
+                    it.player.teleport(specLocation)
+                    it.player.sendMessage(
+                        "${CC.RED}Woah! You went too far out of the spectator zone!"
+                    )
+                }
+            }
 
         CgsGameSpectateMenu.filter = {
             spectatorCuboid.contains(it)
