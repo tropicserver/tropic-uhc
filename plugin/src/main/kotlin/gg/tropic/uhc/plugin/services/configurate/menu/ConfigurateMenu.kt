@@ -46,7 +46,7 @@ class ConfigurateMenu : PaginatedMenu()
                 .forEach {
                     this[size] = ItemBuilder
                         .copyOf(it.item)
-                        .name("${CC.YELLOW}${it.name}")
+                        .name("${CC.GREEN}${it.name}")
                         .setLore(
                             TextSplitter.split(
                                 text = it.description,

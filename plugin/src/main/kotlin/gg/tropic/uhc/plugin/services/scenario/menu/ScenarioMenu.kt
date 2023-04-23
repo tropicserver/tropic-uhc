@@ -41,7 +41,7 @@ class ScenarioMenu : PaginatedMenu()
                 .forEach { (_, scenario) ->
                     this[size] = ItemBuilder
                         .copyOf(scenario.icon)
-                        .name("${CC.YELLOW}${scenario.name}")
+                        .name("${CC.GREEN}${scenario.name}")
                         .setLore(
                             TextSplitter.split(
                                 text = scenario.description,
