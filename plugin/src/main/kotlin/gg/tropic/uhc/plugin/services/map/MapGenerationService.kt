@@ -155,10 +155,6 @@ object MapGenerationService
             50, 256, 50
         )
 
-        CgsGameSpectateMenu.filter = {
-            spectatorCuboid.contains(it)
-        }
-
         Events
             .subscribe(PlayerMoveEvent::class.java)
             .filter(EventUtils::hasPlayerMoved)
@@ -177,6 +173,12 @@ object MapGenerationService
                 }
             }
             .bindWith(plugin)
+
+        CgsGameSpectateMenu.filter = {
+            spectatorCuboid.contains(it)
+        }
+
+        plugin.logger.info("Configured menu filters")
     }
 
     fun startWorldRegeneration(chunksPerRun: Int = 100)

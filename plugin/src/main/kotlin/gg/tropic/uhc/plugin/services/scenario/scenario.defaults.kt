@@ -649,7 +649,7 @@ val timeBomb = object : GameScenario(
 
             if (killer != null)
             {
-                val explosionTime = System.currentTimeMillis() + 1000L * 20
+                val explosionTime = System.currentTimeMillis() + 1000L * 30
                 val hologram = object : UpdatingHologramEntity(
                     text = "${CC.GREEN}${entity.name}'s corpse",
                     location = chest.location.clone().add(1.0, 1.8, 0.5)
