@@ -137,7 +137,7 @@ object ScatterService
             }
             .handler {
                 it.isCancelled = true
-                it.damager.sendMessage("${CC.RED}You cannot hurt other players while Grace Period is active.")
+                it.damager.sendMessage("${CC.RED}You cannot hurt other players during the grace period.")
             }
             .bindWith(plugin)
 
@@ -237,7 +237,7 @@ object ScatterService
                     },
                     {
                         Bukkit.broadcastMessage(
-                            "${CC.SEC}Final Heal occurs in ${CC.PRI}${
+                            "${CC.SEC}Final Heal will occur in ${CC.PRI}${
                                 DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
                             }${CC.SEC}."
                         )
@@ -248,7 +248,7 @@ object ScatterService
                     (gracePeriod.value * 60) + 1,
                     {
                         gracePeriodActive = false
-                        Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! You can now PvP others. ${CC.BOLD}Good luck!")
+                        Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! ${CC.BOLD}You can now PvP others. Good luck!")
 
                         Bukkit.dispatchCommand(
                             Bukkit.getConsoleSender(),
