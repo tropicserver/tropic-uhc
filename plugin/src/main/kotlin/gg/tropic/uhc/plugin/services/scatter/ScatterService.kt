@@ -29,6 +29,7 @@ import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import me.lucko.helper.utils.Players
+import me.lucko.helper.scheduler.threadlock.ServerThreadLock
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -43,6 +44,8 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import java.io.File
+import java.lang.Thread.sleep
+import kotlin.concurrent.thread
 
 /**
  * @author GrowlyX
@@ -293,32 +296,24 @@ object ScatterService
 
                 // we calculate pre start time in ticks so we're
                 // going to convert it to 20, and add another second
-                StartingStateRunnable.PRE_START_TIME =
-                    (estimatePreStartTime() / 20) + 1
-
-                Schedulers
-                    .sync()
-                    .runRepeating(
-                        { task ->
-                            if (CgsGameEngine.INSTANCE.gameState != CgsGameState.STARTING)
-                            {
-                                task.closeAndReportException()
-                                return@runRepeating
-                            }
-
-                            if (playersNotYetScattered.isEmpty())
-                            {
-                                task.closeAndReportException()
-                                return@runRepeating
-                            }
-
-                            val firstNotScattered = playersNotYetScattered.first()
-                            firstNotScattered.scatter()
-                        },
-                        // we have some leeway here, so we'll go for 4 ticks
-                        // instead of the 5 we have time for.
-                        0L, 4L
+                StartingStateRunnable.PRE_START_TIME = (estimatePreStartTime() / 20) + 1
+                
+                thread {
+                    while (
+                        CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING &&
+                        playersNotYetScattered.isNotEmpty()
                     )
+                    {
+                        val firstNotScattered = playersNotYetScattered.first()
+                        ServerThreadLock
+                            .obtain()
+                            .use {
+                                firstNotScattered.scatter()
+                            }
+                            
+                        sleep(50L)
+                    }
+                }
             }
             .bindWith(plugin)
     }
