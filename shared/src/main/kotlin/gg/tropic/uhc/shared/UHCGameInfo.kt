@@ -30,5 +30,6 @@ object UHCGameInfo : CgsGameGeneralInfo(
     init
     {
         this.requiresNoManualConfiguration = false
+        this.timeUntilShutdown = 60
     }
 }
