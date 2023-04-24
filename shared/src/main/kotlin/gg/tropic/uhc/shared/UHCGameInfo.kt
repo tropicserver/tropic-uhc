@@ -19,7 +19,7 @@ object UHCGameInfo : CgsGameGeneralInfo(
         participationCoinRange = 25..100
     ),
     preStartVoting = false,
-    disqualifyOnLogout = true,
+    disqualifyOnLogout = false,
     spectateOnDeath = true,
     showTabHearts = true,
     showNameHearts = true,

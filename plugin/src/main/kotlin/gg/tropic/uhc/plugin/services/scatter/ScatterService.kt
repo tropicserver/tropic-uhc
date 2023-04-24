@@ -25,6 +25,7 @@ import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
 import gg.tropic.uhc.plugin.services.scenario.menu.ScenarioMenu
 import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
+import gg.tropic.uhc.shared.UHCGameInfo
 import me.lucko.helper.Events
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
@@ -73,11 +74,6 @@ object ScatterService
     @Configure
     fun configure()
     {
-        CgsPlayerHandler.dynamicRelogTime = {
-            // allows players to relog if they get logged off during the grace period
-            if (gracePeriodActive) CgsPlayerHandler.RE_LOG_DELTA else 0L
-        }
-
         Events
             .subscribe(PlayerDropItemEvent::class.java)
             .filter {
@@ -253,6 +249,7 @@ object ScatterService
                 createRunner(
                     (gracePeriod.value * 60) + 1,
                     {
+                        UHCGameInfo.disqualifyOnLogout = true
                         gracePeriodActive = false
                         Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! ${CC.BOLD}You can now PvP others. Good luck!")
 
