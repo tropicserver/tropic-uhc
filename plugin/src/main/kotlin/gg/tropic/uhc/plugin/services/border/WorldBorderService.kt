@@ -1,6 +1,7 @@
 package gg.tropic.uhc.plugin.services.border
 
 import gg.scala.flavor.service.Service
+import gg.tropic.uhc.plugin.services.border.bedrock.BedrockBorderMechanism
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
 import gg.tropic.uhc.plugin.services.map.mapNetherWorld
 import gg.tropic.uhc.plugin.services.map.mapWorld
@@ -40,6 +41,12 @@ object WorldBorderService
             }
 
         synchronizeBukkitWorldBorder(size)
+
+        if (size <= 50)
+        {
+            BedrockBorderMechanism
+                .configureBedrockBorder(size)
+        }
     }
 
     fun setCenter(center: Location) =
