@@ -143,7 +143,9 @@ object BorderUpdateEventExecutor
                     TimeUtil.formatIntoDetailedString(
                         seconds
                     )
-                }${CC.SEC}."
+                }${CC.SEC}.${
+                    if (seconds == 60) " Players outside of the border will be teleported within the border." else ""
+                }"
             )
         }
     }

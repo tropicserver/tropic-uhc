@@ -21,7 +21,7 @@ object UHCGameInfo : CgsGameGeneralInfo(
     preStartVoting = false,
     disqualifyOnLogout = true,
     spectateOnDeath = true,
-    showTabHearts = false,
+    showTabHearts = true,
     showNameHearts = true,
     usesCustomArenaWorld = true,
     gameModes = listOf(UHCSoloGameMode)
@@ -30,6 +30,6 @@ object UHCGameInfo : CgsGameGeneralInfo(
     init
     {
         // opposite name, ignore
-//        this.requiresNoManualConfiguration = true
+        this.requiresNoManualConfiguration = true
     }
 }

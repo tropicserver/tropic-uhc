@@ -615,10 +615,10 @@ val timeBomb = object : GameScenario(
         event.blockList().removeIf { block: Block -> block.type == Material.BEDROCK }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun onDeathEvent(event: PlayerDeathEvent)
     {
-        handleTimeBomb(event.entity, event.drops, listOf())
+        handleTimeBomb(event.entity, event.drops, event.drops.toList())
     }
 
     fun handleTimeBomb(
@@ -657,7 +657,7 @@ val timeBomb = object : GameScenario(
                 {
                     override fun getNewLines() = listOf(
                         "${CC.GREEN}${entity.name}'s corpse",
-                        "${CC.SEC}Explodes in ${CC.PRI}${
+                        "${CC.RED}Explodes in ${
                             DurationFormatUtils.formatDurationWords(explosionTime - System.currentTimeMillis(), true, true)
                         }"
                     )
