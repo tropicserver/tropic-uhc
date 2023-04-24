@@ -70,20 +70,14 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 
             CgsGameState.STARTING ->
             {
-                if (ScatterService.playersScattered.size < ScatterService.gameFillCount)
-                {
-                    lines += "${CC.GRAY}Scattering players$ellipsis"
-                    lines += ""
-                }
-
-                lines += "${CC.GRAY}Game will be starting"
-                lines += "${CC.GRAY}in ${CC.WHITE}${
+                lines += "${CC.GOLD}Scattering:"
+                lines += "${CC.WHITE}Scattered: ${CC.GOLD}${ScatterService.playersScattered.size}/${ScatterService.gameFillCount}"
+                lines += "${CC.WHITE}Starts in: ${CC.GOLD}${
                     TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
-                }${CC.GRAY}"
+                }"
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
                 lines += "${CC.WHITE}Mode: ${CC.PRI}FFA"
-                lines += "${CC.WHITE}Scattered: ${CC.GOLD}${ScatterService.playersScattered.size}/${ScatterService.gameFillCount}"
             }
 
             CgsGameState.STARTED ->
