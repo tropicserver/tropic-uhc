@@ -16,8 +16,8 @@ import java.io.File
 @AutoRegister
 object ChunkGenUnlockCommand : ScalaCommand()
 {
-    @CommandAlias("unlock-gen")
-    @CommandPermission("op")
+    @CommandAlias("reset-overworld")
+    @CommandPermission("uhc.command.reset-overworld")
     fun onUnlock(player: ScalaPlayer)
     {
         File(Bukkit.getWorldContainer(), "tropic.uhc.lock").delete()
