@@ -49,7 +49,7 @@ object QueueChunkGenCommand : ScalaCommand()
             )
     }
 
-    @CommandAlias("queue-chunk-reload")
+    @CommandAlias("generate-overworld")
     @CommandPermission("uhc.command.regen")
     fun onQueueChunkLoad(
         player: ScalaPlayer, @Optional chunksPerRun: Int?
