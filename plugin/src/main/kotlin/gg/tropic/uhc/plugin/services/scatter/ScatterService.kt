@@ -36,6 +36,7 @@ import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -66,6 +67,7 @@ object ScatterService
             }
 
     var gameFillCount = 0
+    var gracePeriodActive = true
 
     @Configure
     fun configure()
@@ -122,6 +124,20 @@ object ScatterService
             }
             .handler {
                 it.spectator.applyLobbyItems()
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(EntityDamageByEntityEvent::class.java)
+            .expireIf {
+                !gracePeriodActive
+            }
+            .filter {
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTED && it.entity is Player
+            }
+            .handler {
+                it.isCancelled = true
+                it.damager.sendMessage("${CC.RED}You cannot hurt other players while Grace Period is active.")
             }
             .bindWith(plugin)
 
@@ -217,11 +233,11 @@ object ScatterService
                             it.health = it.maxHealth
                         }
 
-                        Bukkit.broadcastMessage("${CC.GREEN}Final heal has occurred! ${CC.BOLD}Good luck!")
+                        Bukkit.broadcastMessage("${CC.GREEN}Final Heal has occurred! ${CC.BOLD}Good luck!")
                     },
                     {
                         Bukkit.broadcastMessage(
-                            "${CC.SEC}Final heal occurs in ${CC.PRI}${
+                            "${CC.SEC}Final Heal occurs in ${CC.PRI}${
                                 DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
                             }${CC.SEC}."
                         )
@@ -231,9 +247,7 @@ object ScatterService
                 createRunner(
                     (gracePeriod.value * 60) + 1,
                     {
-                        mapWorld().pvp = true
-                        mapNetherWorld().pvp = true
-
+                        gracePeriodActive = false
                         Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! You can now PvP others. ${CC.BOLD}Good luck!")
 
                         Bukkit.dispatchCommand(

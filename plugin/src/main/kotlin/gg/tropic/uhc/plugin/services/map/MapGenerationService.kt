@@ -92,7 +92,6 @@ object MapGenerationService
             uhcWorld.setGameRuleValue("naturalRegeneration", "false")
 
             uhcWorld.time = 0
-            uhcWorld.pvp = false
             uhcWorld.difficulty = Difficulty.NORMAL
 
             cuboid = Cuboid(
@@ -128,7 +127,6 @@ object MapGenerationService
         uhcNether.setGameRuleValue("naturalRegeneration", "false")
 
         uhcNether.time = 0
-        uhcNether.pvp = false
 
         WorldBorderService
             .setCenter(cuboid.center)
@@ -272,7 +270,6 @@ object MapGenerationService
         uhcWorld.setGameRuleValue("naturalRegeneration", "false")
 
         uhcWorld.time = 0
-        uhcWorld.pvp = false
         uhcWorld.difficulty = Difficulty.NORMAL
 
         cuboid = Cuboid(
