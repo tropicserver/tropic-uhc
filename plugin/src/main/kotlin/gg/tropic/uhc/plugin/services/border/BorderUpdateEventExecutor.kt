@@ -136,6 +136,8 @@ object BorderUpdateEventExecutor
             }
         }
 
+        private val extraInfoTimestamps = listOf(60, 30, 120, 60 * 5)
+
         override fun onRun()
         {
             broadcast(
@@ -144,7 +146,7 @@ object BorderUpdateEventExecutor
                         seconds
                     )
                 }${CC.SEC}.${
-                    if (seconds == 60) " Players outside of the border will be teleported within the border." else ""
+                    if (seconds in extraInfoTimestamps) " Players outside of the border will be teleported within the border." else ""
                 }"
             )
         }
