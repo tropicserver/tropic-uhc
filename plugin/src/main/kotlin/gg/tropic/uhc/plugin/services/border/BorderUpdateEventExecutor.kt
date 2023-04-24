@@ -10,6 +10,7 @@ import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.Tasks.sync
 import net.evilblock.cubed.util.time.TimeUtil
 import kotlin.math.max
 
@@ -34,7 +35,8 @@ object BorderUpdateEventExecutor
     {
         val runnable = BorderUpdateRunnable(
             firstShrink.value * 60,
-            (WorldBorderService.initialSize - firstShrinkAmount.value.toDouble()).toInt()
+            (WorldBorderService.initialSize - firstShrinkAmount.value.toDouble()).toInt(),
+            overrideAutoCalculation = true
         )
 
         WorldBorderService
@@ -58,7 +60,9 @@ object BorderUpdateEventExecutor
     {
         if (WorldBorderService.currentSize > 10)
         {
-            oneHundredIntervals[indexForHundreds]
+            oneHundredIntervals
+                .getOrNull(indexForHundreds + 1)
+                ?: oneHundredIntervals.last()
         } else 10
     }
 
@@ -79,7 +83,7 @@ object BorderUpdateEventExecutor
     }
 
     class BorderUpdateRunnable(
-        seconds: Int, val next: Int
+        seconds: Int, val next: Int, val overrideAutoCalculation: Boolean = false
     ) : CountdownRunnable(seconds)
     {
         override fun getSeconds() = broadcastIntervals
@@ -95,7 +99,13 @@ object BorderUpdateEventExecutor
             WorldBorderService.pushSizeUpdate(next.toDouble())
 
             // retrieves the next border (if there is any)
-            calculateNextBorder()
+            if (!overrideAutoCalculation)
+            {
+                calculateNextBorder()
+            } else
+            {
+                WorldBorderService.currentSize = next.toDouble()
+            }
 
             // checks if this runnable is not
             // handling the last border update
@@ -122,7 +132,9 @@ object BorderUpdateEventExecutor
 
                 if (flatMeetup.value)
                 {
-                    WorldBorderService.flatZone(25)
+                    sync {
+                        WorldBorderService.flatZone(25)
+                    }
                 }
             }
         }
