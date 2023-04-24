@@ -11,6 +11,7 @@ import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.time.TimeUtil
+import kotlin.math.max
 
 /**
  * @author GrowlyX
@@ -27,15 +28,13 @@ object BorderUpdateEventExecutor
     var currentBorderUpdater: BorderUpdateRunnable? = null
 
     private val oneHundredIntervals = arrayOf(100, 50, 25, 10)
-    private var indexForHundreds = -1
-
-    private var initialDecrease = false
+    private var indexForHundreds = 0
 
     fun start()
     {
         val runnable = BorderUpdateRunnable(
             firstShrink.value * 60,
-            firstShrinkAmount.value
+            (WorldBorderService.initialSize - firstShrinkAmount.value.toDouble()).toInt()
         )
 
         WorldBorderService
@@ -54,7 +53,7 @@ object BorderUpdateEventExecutor
 
     fun getNextBorder() = if (WorldBorderService.currentSize > 100)
     {
-        (WorldBorderService.currentSize - borderDecreaseAmount.value).toInt()
+        max((WorldBorderService.currentSize - borderDecreaseAmount.value).toInt(), 100)
     } else
     {
         if (WorldBorderService.currentSize > 10)
@@ -65,13 +64,6 @@ object BorderUpdateEventExecutor
 
     fun calculateNextBorder()
     {
-        if (!initialDecrease)
-        {
-            initialDecrease = true
-            WorldBorderService.currentSize -= firstShrinkAmount.value
-            return
-        }
-
         if (WorldBorderService.currentSize > 100)
         {
             WorldBorderService.currentSize -= borderDecreaseAmount.value
@@ -79,9 +71,8 @@ object BorderUpdateEventExecutor
         {
             if (WorldBorderService.currentSize > 10)
             {
-                indexForHundreds++
                 WorldBorderService.currentSize =
-                    oneHundredIntervals[indexForHundreds]
+                    oneHundredIntervals[indexForHundreds++]
                         .toDouble()
             }
         }

@@ -31,7 +31,7 @@ object BedrockBorderMechanism
         for (i in 0 until blocksHigh)
         {
             Bukkit.getScheduler()
-                .runTaskLater(CgsGameEngine.INSTANCE.plugin, { this.addBedrockBorder(world, (radius / 2) - 1) }, i.toLong())
+                .runTaskLater(CgsGameEngine.INSTANCE.plugin, { this.addBedrockBorder(world, (radius / 2) + 2) }, i.toLong())
         }
     }
 

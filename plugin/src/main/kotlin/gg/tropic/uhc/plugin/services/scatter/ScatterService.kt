@@ -321,7 +321,7 @@ object ScatterService
      * scattered. We also add 10 seconds to compensate for any lag/other issues
      * that may occur and delay the scattering process.
      */
-    fun estimatePreStartTime() = (playersNotYetScattered.size * 5) + (15 * 20)
+    fun estimatePreStartTime() = (playersNotYetScattered.size * 5) + (20 * 20)
 
     fun Player.scatter()
     {
