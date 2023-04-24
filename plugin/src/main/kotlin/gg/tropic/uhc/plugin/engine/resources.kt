@@ -3,6 +3,7 @@ package gg.tropic.uhc.plugin.engine
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
+import gg.scala.cgs.common.runnable.state.EndedStateRunnable
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.lemon.LemonConstants
@@ -121,6 +122,9 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
                 lines += "${CC.WHITE}Participants: ${CC.GOLD}${ScatterService.gameFillCount}"
+                lines += "${CC.WHITE}Ends in: ${CC.GOLD}${
+                    60 - EndedStateRunnable.currentTick
+                }s"
             }
 
             else ->
