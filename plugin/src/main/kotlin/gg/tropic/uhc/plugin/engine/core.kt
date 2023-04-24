@@ -47,21 +47,21 @@ class UHCGameEngine(
         override fun getExtraInformation() = emptyList<String>()
     }
 
-    override fun getNametagAdapter() = object : CgsGameNametagAdapter
-    {
-        override fun computeNametag(viewer: CgsGamePlayer, target: CgsGamePlayer) = null
-    }
+    private val cachedNametag =
+        object : CgsGameNametagAdapter
+        {
+            override fun computeNametag(viewer: CgsGamePlayer, target: CgsGamePlayer) = null
+        }
+
+    override fun getNametagAdapter() = cachedNametag
 
     override fun getScoreboardRenderer() = UHCScoreboardRenderer
 
-    override fun getVisibilityAdapter() = object : CgsGameVisibilityAdapter
-    {
-        override fun computeVisibility(viewer: CgsGamePlayer, target: CgsGamePlayer): VisibilityAction
+    private val cachedVisibility =
+        object : CgsGameVisibilityAdapter
         {
-            if (!Bukkit.getPlayer(viewer.identifier).hasPermission("uhc.moderator"))
-                return VisibilityAction.HIDE
-
-            return VisibilityAction.NEUTRAL
+            override fun computeVisibility(viewer: CgsGamePlayer, target: CgsGamePlayer) = VisibilityAction.NEUTRAL
         }
-    }
+
+    override fun getVisibilityAdapter() = cachedVisibility
 }
