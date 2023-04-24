@@ -226,6 +226,16 @@ object ScatterService
                         !it.hasMetadata("spectator")
                     }
 
+                Bukkit.getOnlinePlayers()
+                    .filter {
+                        it.hasMetadata("spectator")
+                    }
+                    .forEach { spectator ->
+                        spectator.teleport(
+                            CgsGameEngine.INSTANCE.gameArena!!.getSpectatorLocation()
+                        )
+                    }
+
                 Bukkit.setWhitelist(true)
                 Bukkit.broadcastMessage("$prefix${CC.GREEN}The server is no longer allowing new players to join. Players will now be scattered.")
 
