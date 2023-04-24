@@ -12,6 +12,8 @@ import gg.scala.commons.issuer.ScalaPlayer
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
+import gg.tropic.uhc.plugin.services.map.mapNetherWorld
+import gg.tropic.uhc.plugin.services.map.mapWorld
 import gg.tropic.uhc.plugin.services.styles.prefix
 import net.evilblock.cubed.util.CC
 
@@ -22,6 +24,31 @@ import net.evilblock.cubed.util.CC
 @AutoRegister
 object QueueChunkLoadCommand : ScalaCommand()
 {
+    @CommandAlias("generate-nether")
+    @CommandPermission("uhc.command.regen")
+    fun onGenerateNether(player: ScalaPlayer)
+    {
+        if (MapGenerationService.generating)
+        {
+            throw ConditionFailedException("The map is already generating!")
+        }
+
+        if (CgsGameEngine.INSTANCE.gameState != CgsGameState.WAITING)
+        {
+            throw ConditionFailedException("You cannot regen at this time!")
+        }
+
+        WorldBorderService
+            .pushSizeUpdate(
+                initialBorderSize.value.toDouble()
+            )
+
+        MapGenerationService
+            .startWorldRegeneration(
+                100, mapNetherWorld()
+            )
+    }
+
     @CommandAlias("queue-chunk-reload")
     @CommandPermission("uhc.command.regen")
     fun onQueueChunkLoad(
@@ -41,7 +68,7 @@ object QueueChunkLoadCommand : ScalaCommand()
         player.sendMessage(
             "$prefix${CC.GREEN}Starting a chunk reload task with a chunk load freq of ${chunksPerRun ?: 100}."
         )
-        
+
         WorldBorderService
             .pushSizeUpdate(
                 initialBorderSize.value.toDouble()
@@ -49,7 +76,7 @@ object QueueChunkLoadCommand : ScalaCommand()
 
         MapGenerationService
             .startWorldRegeneration(
-                chunksPerRun ?: 100
+                chunksPerRun ?: 100, mapWorld()
             )
     }
 }

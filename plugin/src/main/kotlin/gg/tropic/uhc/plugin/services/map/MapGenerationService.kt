@@ -137,7 +137,7 @@ object MapGenerationService
             )
 
         configureSpectatorBounds()
-        startWorldRegeneration()
+        startWorldRegeneration(world = mapWorld())
     }
 
     private fun configureSpectatorBounds()
@@ -199,7 +199,7 @@ object MapGenerationService
         plugin.logger.info("Configured menu filters")
     }
 
-    fun startWorldRegeneration(chunksPerRun: Int = 100)
+    fun startWorldRegeneration(chunksPerRun: Int = 100, world: World)
     {
         if (generating)
         {
@@ -208,7 +208,7 @@ object MapGenerationService
 
         val loadTask = MapChunkLoadTask(
             Bukkit.getServer(),
-            mapWorld().name,
+            world.name,
             CoordXZ.chunkToBlock(13),
             chunksPerRun,
             3
