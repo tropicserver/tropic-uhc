@@ -235,6 +235,11 @@ object ScatterService
                         mapNetherWorld().pvp = true
 
                         Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! You can now PvP others. ${CC.BOLD}Good luck!")
+
+                        Bukkit.dispatchCommand(
+                            Bukkit.getConsoleSender(),
+                            "unmutechat"
+                        )
                     },
                     {
                         Bukkit.broadcastMessage(
@@ -266,6 +271,10 @@ object ScatterService
                     }
 
                 Bukkit.setWhitelist(true)
+                Bukkit.dispatchCommand(
+                    Bukkit.getConsoleSender(),
+                    "mutechat"
+                )
                 Bukkit.broadcastMessage("$prefix${CC.GREEN}The server is no longer allowing new players to join. Players will now be scattered.")
 
                 // we calculate pre start time in ticks so we're
