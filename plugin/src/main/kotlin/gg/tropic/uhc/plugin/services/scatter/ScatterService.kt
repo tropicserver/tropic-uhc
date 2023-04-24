@@ -107,7 +107,7 @@ object ScatterService
 
                 inventory.setItem(
                     8, ItemBuilder
-                        .of(XMaterial.LIGHT_GRAY_DYE)
+                        .of(XMaterial.GRAY_DYE)
                         .name("${CC.GRAY}Spectate ${CC.GRAY}(Right Click)")
                         .build()
                 )
