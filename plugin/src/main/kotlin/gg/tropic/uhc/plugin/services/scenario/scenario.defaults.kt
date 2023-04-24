@@ -52,7 +52,7 @@ fun isNotPlaying(player: Player) = !player.playing
 val bloodDiamonds = object : GameScenario(
     name = "Blood Diamonds",
     icon = ItemStack(Material.DIAMOND_PICKAXE),
-    description = "You lose 1/2 heart for every diamond you mine."
+    description = "Players lose half a heart when they mine a diamond."
 )
 {
     @EventHandler
@@ -73,7 +73,7 @@ val bloodDiamonds = object : GameScenario(
 val bloodEnchants = object : GameScenario(
     "Blood Enchants",
     ItemStack(Material.ENCHANTMENT_TABLE),
-    "You lose half a heart for every level you enchant."
+    "Players lose half a heart for every level they enchant."
 )
 {
     @EventHandler
@@ -83,23 +83,20 @@ val bloodEnchants = object : GameScenario(
         {
             return
         }
-        event.player.damage(1.0)
+
+        if (event.newLevel - event.oldLevel < 0)
+        {
+            event.player.damage(
+                (event.oldLevel - event.newLevel) * 0.5
+            )
+        } 
     }
-}
-
-val backpacks = object : GameScenario(
-    "BackPacks",
-    ItemStack(Material.CHEST),
-    "Use /backpack or /bp to open the team inventory."
-)
-{
-
 }
 
 val bareBones = object : GameScenario(
     "BareBones",
     ItemStack(Material.BONE),
-    "All ores except for iron & coal will drop iron ingots. Each player death drops 1 diamond, 1 golden apple, 32 arrows and 2 strings. Enchanting tables, Anvils and Golden Apples cannot be crafted. Nether is disabled."
+    "All ores except for iron & coal will drop iron ingots. Each player killed drops 1 diamond, 1 golden apple, 32 arrows and 2 strings. Enchanting tables, Anvils and Golden Apples cannot be crafted. Nether is disabled."
 )
 {
     @EventHandler
@@ -134,7 +131,7 @@ val bareBones = object : GameScenario(
 val coldWeapons = object : GameScenario(
     "Cold Weapons",
     ItemStack(Material.SNOW_BALL),
-    "Fire aspect and Flame enchantments are disabled."
+    "All fire-based enchants are disabled (flame & fire aspect)."
 )
 {
     @EventHandler
@@ -195,7 +192,7 @@ val coldWeapons = object : GameScenario(
 val limitations = object : GameScenario(
     "Limitations",
     ItemStack(Material.LEASH),
-    "You can only mine 16 diamonds, 32 gold and 64 iron."
+    "Players can only mine 16 diamonds, 32 gold, and 64 iron throughout the game."
 )
 {
 
@@ -204,7 +201,7 @@ val limitations = object : GameScenario(
 val noEnchants = object : GameScenario(
     "No Enchants",
     ItemStack(Material.ENCHANTMENT_TABLE),
-    "You cannot enchant or use anvils."
+    "Players cannot use enchanting tables and/or anvils."
 )
 {
     @EventHandler
@@ -251,7 +248,7 @@ val noEnchants = object : GameScenario(
 val noFallDamage = object : GameScenario(
     "NoFallDamage",
     ItemStack(Material.DIAMOND_BOOTS),
-    "You cannot take fall damage."
+    "Players cannot take fall damage."
 )
 {
     @EventHandler
@@ -274,7 +271,7 @@ val noFallDamage = object : GameScenario(
 val horseLess = object : GameScenario(
     "Horseless",
     ItemStack(Material.DIAMOND_BARDING),
-    "You cannot tame horses. You cannot tame donkeys."
+    "Players cannot tame donkies or horses."
 )
 {
     @EventHandler
@@ -290,7 +287,7 @@ val horseLess = object : GameScenario(
 val cutClean = object : GameScenario(
     "CutClean",
     ItemStack(Material.IRON_INGOT),
-    "All ores and food are automatically cooked or smelted."
+    "Any ores or cookable foods are automatically smelted."
 )
 {
     @EventHandler
@@ -506,11 +503,11 @@ val cutClean = object : GameScenario(
 
 val oreFrenzy = object : GameScenario(
     "Ore Frenzy", ItemStack(Material.LAPIS_ORE),
-    "When you mine lapis ore it drops a health splash potion." +
-            " When you mine emerald ore it drops 32 arrows." +
-            " When you mine redstone ore it drops an unenchanted book. " +
-            "When you mine diamond ore it drops a diamond and 4 bottles of experience. " +
-            "When you mine quartz ore it drops a block of TNT."
+    "Mining lapis ore drops a health splash potion. " +
+            "Mining emerald ore drops 32 arrows. " +
+            "Mining redstone ore drops an unenchanted book. " +
+            "Mining diamond ore drops a diamond and 4 bottles of experience. " +
+            "Mining quartz ore drops a block of TNT."
 )
 {
 
@@ -519,7 +516,7 @@ val oreFrenzy = object : GameScenario(
 val luckyLeaves = object : GameScenario(
     "Lucky Leaves",
     ItemStack(Material.LEAVES),
-    "There is a low chance of golden apples dropping from trees."
+    "There is a 75% chance of a golden apple dropping when leaves decay."
 )
 {
     @EventHandler
@@ -538,7 +535,7 @@ val luckyLeaves = object : GameScenario(
 val hasteyBoys = object : GameScenario(
     "Hastey Boys",
     ItemStack(Material.IRON_PICKAXE),
-    "Everyone mines faster."
+    "Any mining/harvesting tools are automatically enchanted with: Efficiency III, Unbreaking III."
 )
 {
     @EventHandler
@@ -563,7 +560,7 @@ val hasteyBoys = object : GameScenario(
 val diamondless = object : GameScenario(
     "Diamondless",
     ItemStack(Material.DIAMOND),
-    "You cannot mine diamonds. Players drop 1 diamond on death."
+    "Players cannot mine diamonds. Players killed drop 1 diamond upon their death."
 )
 {
     @EventHandler(priority = EventPriority.LOWEST)
@@ -576,7 +573,7 @@ val diamondless = object : GameScenario(
 val goldless = object : GameScenario(
     "Goldless",
     ItemStack(Material.GOLD_INGOT),
-    "You cannot mine gold. Players drop 8 gold ingot and 1 golden head on death."
+    "Players cannot mine gold. Players drop 8 gold ingots and 1 golden head upon their death."
 )
 {
     @EventHandler(priority = EventPriority.LOWEST)
@@ -606,7 +603,7 @@ val goldenRetriever = object : GameScenario(
 val timeBomb = object : GameScenario(
     "Time Bomb",
     ItemStack(Material.TNT),
-    "When a player dies, their loot will drop into a chest. After 30s, the chest will explode."
+    "When a player dies, their loot will deposit into a chest. After 30 seconds, the chest will explode."
 )
 {
     @EventHandler
@@ -728,7 +725,7 @@ val timeBomb = object : GameScenario(
 val fireless = object : GameScenario(
     "Fireless",
     ItemStack(Material.FLINT_AND_STEEL),
-    "You cannot take fire damage only in overworld."
+    "Players cannot take fire damage in the overworld."
 )
 {
     @EventHandler
@@ -751,7 +748,7 @@ val fireless = object : GameScenario(
 val doubleExp = object : GameScenario(
     "Double Exp",
     ItemStack(Material.EXP_BOTTLE, 2),
-    "When you mine ores you receive double exp."
+    "Players receive double the experience when they mine an ore."
 )
 {
 
@@ -760,7 +757,7 @@ val doubleExp = object : GameScenario(
 val rodLess = object : GameScenario(
     "Rodless",
     ItemStack(Material.FISHING_ROD),
-    "Fishing Rods cannot be crafted/used."
+    "Players cannot craft or use fishing rods."
 )
 {
     @EventHandler
@@ -798,7 +795,7 @@ val rodLess = object : GameScenario(
 val swordLess = object : GameScenario(
     "Swordless",
     ItemStack(Material.GOLD_SWORD),
-    "Swords cannot be crafted/used."
+    "Players cannot craft or use swords."
 )
 {
     @EventHandler
@@ -835,7 +832,7 @@ val swordLess = object : GameScenario(
 val timber = object : GameScenario(
     "Timber",
     ItemStack(Material.LOG),
-    "When you break one log, it automatically breaks whole tree."
+    "Players receive all the wood from a tree if they break one log from it."
 )
 {
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -892,16 +889,16 @@ val timber = object : GameScenario(
 val doubleOres = object : GameScenario(
     "Double Ores",
     ItemStack(Material.GOLD_INGOT, 2),
-    "All ores and food are doubled when mined/harvested."
+    "Players receive double the ores and food when mined/harvested."
 )
 {
-
+`
 }
 
 val webCage = object : GameScenario(
     "WebCage",
     ItemStack(Material.WEB),
-    "When you kill a player a sphere of cobwebs surrounds you."
+    "Players receive a cobweb sphere when they kill a player."
 )
 {
     @EventHandler(priority = EventPriority.LOWEST)
@@ -953,7 +950,7 @@ val webCage = object : GameScenario(
 val tripleOres = object : GameScenario(
     "Triple Ores",
     ItemStack(Material.DIAMOND, 3),
-    "All ores and food are tripled when mined/harvested."
+    "Players receive triple the ores and food when mined/harvested."
 )
 {
 
@@ -962,7 +959,7 @@ val tripleOres = object : GameScenario(
 val tripleExp = object : GameScenario(
     "Triple Exp",
     ItemStack(Material.EXP_BOTTLE, 3),
-    "When you mine ores you receive triple exp."
+    "Players receive triple the experience when they mine ores."
 )
 {
 
@@ -971,7 +968,7 @@ val tripleExp = object : GameScenario(
 val bowless = object : GameScenario(
     "Bowless",
     ItemStack(Material.BOW),
-    "Bows cannot be crafted/used."
+    "Players cannot craft or use bows."
 )
 {
     @EventHandler
