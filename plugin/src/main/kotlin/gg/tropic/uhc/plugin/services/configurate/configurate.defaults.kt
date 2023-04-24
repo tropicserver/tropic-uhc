@@ -182,11 +182,10 @@ val starterFood = configurable(
     64
 )
 
-// continue
 val flatMeetup = configurable(
     "Flat 25x25",
     ItemStack(Material.GRASS),
-    "Should game have flat at 25x25 border?",
+    "Should game have a flat grass zone when the border is set to 25x25?",
     false
 )
 
@@ -200,7 +199,7 @@ val iPvP = configurable(
 val oresToInventory = configurable(
     "Ores to inventory",
     ItemStack(Material.DIAMOND_ORE),
-    "Should ores go to player inventory?",
+    "Should ores go straight into players' inventories?",
     false
 )
 
