@@ -2,6 +2,7 @@ package gg.tropic.uhc.plugin.services.scatter
 
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.flavor.inject.Inject
@@ -41,6 +42,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import java.io.File
 import java.lang.Thread.sleep
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 /**
@@ -71,6 +73,11 @@ object ScatterService
     @Configure
     fun configure()
     {
+        CgsPlayerHandler.dynamicRelogTime = {
+            // allows players to relog if they get logged off during the grace period
+            if (gracePeriodActive) CgsPlayerHandler.RE_LOG_DELTA else 0L
+        }
+
         Events
             .subscribe(PlayerDropItemEvent::class.java)
             .filter {
