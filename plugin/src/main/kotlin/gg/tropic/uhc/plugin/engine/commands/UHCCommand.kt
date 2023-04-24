@@ -15,9 +15,11 @@ import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.flavor.inject.Inject
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.services.map.mapWorld
 import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
 import net.evilblock.cubed.util.CC
+import org.bukkit.Location
 import org.bukkit.metadata.FixedMetadataValue
 
 /**
@@ -45,7 +47,6 @@ object UHCCommand : ScalaCommand()
     fun onStart(player: ScalaPlayer) = ForceStartCommand
         .onForceStart(player.bukkit())
 
-    @AssignPermission
     @Subcommand("xray-alerts")
     @Description("Enable X-Ray alerts.")
     fun onXRayAlerts(player: ScalaPlayer)
@@ -57,6 +58,21 @@ object UHCCommand : ScalaCommand()
 
         player.sendMessage(
             "$prefix${CC.GREEN}You've enabled X-Ray alerts."
+        )
+    }
+
+    @Subcommand("world-preview")
+    @Description("Preview the UHC game's world.")
+    fun onWorldPreview(player: ScalaPlayer)
+    {
+        player.teleport(
+            Location(
+                mapWorld(),
+                0.500, 100.0, 0.500
+            )
+        )
+        player.sendMessage(
+            "$prefix${CC.GREEN}You were teleported to the UHC world!"
         )
     }
 
