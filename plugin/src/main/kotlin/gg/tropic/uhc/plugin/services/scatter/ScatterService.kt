@@ -1,8 +1,10 @@
 package gg.tropic.uhc.plugin.services.scatter
 
+import com.cryptomorin.xseries.XMaterial
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
+import gg.scala.cgs.game.command.SpectateCommand
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -86,6 +88,43 @@ object ScatterService
             }
             .bindWith(plugin)
 
+        fun Player.applyLobbyItems()
+        {
+            Tasks.delayed(3L) {
+                inventory.setItem(
+                    0, ItemBuilder
+                        .of(Material.BOOK)
+                        .name("${CC.GOLD}Game Config ${CC.GRAY}(Right Click)")
+                        .build()
+                )
+
+                inventory.setItem(
+                    1, ItemBuilder
+                        .of(Material.EYE_OF_ENDER)
+                        .name("${CC.GOLD}Scenarios ${CC.GRAY}(Right Click)")
+                        .build()
+                )
+
+                inventory.setItem(
+                    8, ItemBuilder
+                        .of(XMaterial.LIGHT_GRAY_DYE)
+                        .name("${CC.GRAY}Spectate ${CC.GRAY}(Right Click)")
+                        .build()
+                )
+                updateInventory()
+            }
+        }
+
+        Events
+            .subscribe(CgsGameEngine.CgsGameSpectatorRemoveEvent::class.java)
+            .filter {
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.WAITING
+            }
+            .handler {
+                it.spectator.applyLobbyItems()
+            }
+            .bindWith(plugin)
+
         Events
             .subscribe(PlayerJoinEvent::class.java)
             .filter {
@@ -96,22 +135,7 @@ object ScatterService
                 it.player.sendMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
                 it.player.sendMessage("$prefix${CC.WHITE}Today's game host: ${hostDisplayName()}")
 
-                Tasks.delayed(3L) {
-                    it.player.inventory.setItem(
-                        0, ItemBuilder
-                            .of(Material.BOOK)
-                            .name("${CC.GOLD}Game Config ${CC.GRAY}(Right Click)")
-                            .build()
-                    )
-
-                    it.player.inventory.setItem(
-                        1, ItemBuilder
-                            .of(Material.EYE_OF_ENDER)
-                            .name("${CC.GOLD}Scenarios ${CC.GRAY}(Right Click)")
-                            .build()
-                    )
-                    it.player.updateInventory()
-                }
+                it.player.applyLobbyItems()
             }
             .bindWith(plugin)
 
@@ -132,6 +156,11 @@ object ScatterService
                     Material.EYE_OF_ENDER ->
                     {
                         ScenarioMenu().openMenu(it.player)
+                    }
+
+                    Material.INK_SACK ->
+                    {
+                        it.player.chat("/spectate confirm")
                     }
 
                     else ->
