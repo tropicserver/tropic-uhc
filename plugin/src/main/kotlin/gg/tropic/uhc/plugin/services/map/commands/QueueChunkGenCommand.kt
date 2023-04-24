@@ -22,7 +22,7 @@ import net.evilblock.cubed.util.CC
  * @since 4/21/2023
  */
 @AutoRegister
-object QueueChunkLoadCommand : ScalaCommand()
+object QueueChunkGenCommand : ScalaCommand()
 {
     @CommandAlias("generate-nether")
     @CommandPermission("uhc.command.regen")

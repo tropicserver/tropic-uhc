@@ -14,7 +14,7 @@ import java.io.File
  * @since 4/21/2023
  */
 @AutoRegister
-object UnlockCommand : ScalaCommand()
+object ChunkGenUnlockCommand : ScalaCommand()
 {
     @CommandAlias("unlock-gen")
     @CommandPermission("op")
