@@ -128,11 +128,15 @@ object ScatterService
                     {
                         ConfigurateMenu().openMenu(it.player)
                     }
+
                     Material.EYE_OF_ENDER ->
                     {
                         ScenarioMenu().openMenu(it.player)
                     }
-                    else -> {}
+
+                    else ->
+                    {
+                    }
                 }
             }
             .bindWith(plugin)
@@ -187,9 +191,11 @@ object ScatterService
                         Bukkit.broadcastMessage("${CC.GREEN}Final heal has occurred! ${CC.BOLD}Good luck!")
                     },
                     {
-                        Bukkit.broadcastMessage("${CC.SEC}Final heal occurs in ${CC.PRI}${
-                            DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
-                        }${CC.SEC}.")
+                        Bukkit.broadcastMessage(
+                            "${CC.SEC}Final heal occurs in ${CC.PRI}${
+                                DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
+                            }${CC.SEC}."
+                        )
                     }
                 )
 
@@ -202,9 +208,11 @@ object ScatterService
                         Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! You can now PvP others. ${CC.BOLD}Good luck!")
                     },
                     {
-                        Bukkit.broadcastMessage("${CC.SEC}Grace Period ends in ${CC.PRI}${
-                            DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
-                        }${CC.SEC}.")
+                        Bukkit.broadcastMessage(
+                            "${CC.SEC}Grace Period ends in ${CC.PRI}${
+                                DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
+                            }${CC.SEC}."
+                        )
                     }
                 )
             }
@@ -213,8 +221,10 @@ object ScatterService
         Events
             .subscribe(CgsGameEngine.CgsGamePreStartEvent::class.java)
             .handler {
-                // TODO: exclude staff and host?
-                gameFillCount = Bukkit.getOnlinePlayers().size
+                gameFillCount = Bukkit.getOnlinePlayers()
+                    .count {
+                        !it.hasMetadata("spectator")
+                    }
 
                 Bukkit.setWhitelist(true)
                 Bukkit.broadcastMessage("$prefix${CC.GREEN}The server is no longer allowing new players to join. Players will now be scattered.")
