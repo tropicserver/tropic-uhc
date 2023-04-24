@@ -68,7 +68,9 @@ class ConfigurateMenu : PaginatedMenu()
                             {
                                 addToLore(
                                     "",
-                                    "${CC.WHITE}Current: ${CC.GREEN}${it.value}"
+                                    "${CC.WHITE}Current: ${CC.GREEN}${
+                                        if (it.value == true) "Yes" else if (it.value == false) "${CC.RED}No" else it.value
+                                    }"
                                 )
                             }
 
@@ -83,12 +85,6 @@ class ConfigurateMenu : PaginatedMenu()
                         .toButton { _, _ ->
                             if (!player.isHost())
                             {
-                                return@toButton
-                            }
-
-                            if (CgsGameEngine.INSTANCE.gameState != CgsGameState.WAITING)
-                            {
-                                player.sendMessage("${CC.RED}You cannot modify the config right now!")
                                 return@toButton
                             }
 
