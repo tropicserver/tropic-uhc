@@ -2,6 +2,7 @@ package gg.tropic.uhc.plugin.services.border
 
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
+import gg.tropic.uhc.plugin.services.map.mapNetherWorld
 import gg.tropic.uhc.plugin.services.map.mapWorld
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
@@ -19,7 +20,7 @@ import org.bukkit.entity.Player
 @Service
 object WorldBorderService
 {
-    private var center: Location? = null
+    private var center: Pair<Double, Double>? = null
 
     val initialSize: Double
         get() = initialBorderSize.value.toDouble()
@@ -30,29 +31,39 @@ object WorldBorderService
     fun pushSizeUpdate(size: Double)
     {
         currentSize = size
-        ensurePlayersWithinBorderBounds(border = size.toInt())
+
+        listOf(mapWorld(), mapNetherWorld())
+            .forEach {
+                ensurePlayersWithinBorderBounds(
+                    border = size.toInt(), world = it.name
+                )
+            }
+
         synchronizeBukkitWorldBorder(size)
     }
 
     fun setCenter(center: Location) =
         apply {
-            this.center = center
+            this.center = center.x to center.z
         }
 
     private fun synchronizeBukkitWorldBorder(size: Double)
     {
-        val worldBorder = center!!.world.worldBorder
-        worldBorder.setCenter(center!!.x, center!!.z)
-        worldBorder.size = size
+        listOf(mapWorld(), mapNetherWorld())
+            .forEach {
+                val worldBorder = it.worldBorder
+                worldBorder.setCenter(center!!.first, center!!.second)
+                worldBorder.size = size
+            }
     }
 
     private const val BOUND_OFFSET = 5.5
 
-    fun ensurePlayersWithinBorderBounds(border: Int)
+    fun ensurePlayersWithinBorderBounds(border: Int, world: String)
     {
         Players.all()
             .filter {
-                it.world.name == mapWorld().name
+                it.world.name == world
             }
             .forEach {
                 val maximum = border / 2
