@@ -60,7 +60,7 @@ object ScatterService
     val playersNotYetScattered: List<Player>
         get() = Players.all()
             .filter {
-                !it.hasMetadata("scattered")
+                !it.hasMetadata("scattered") && !it.hasMetadata("spectator")
             }
 
     var gameFillCount = 0
