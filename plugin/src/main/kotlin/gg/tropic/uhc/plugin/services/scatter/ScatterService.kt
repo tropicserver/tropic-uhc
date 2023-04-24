@@ -4,7 +4,6 @@ import com.cryptomorin.xseries.XMaterial
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
-import gg.scala.cgs.game.command.SpectateCommand
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -20,16 +19,13 @@ import gg.tropic.uhc.plugin.services.configurate.menu.ConfigurateMenu
 import gg.tropic.uhc.plugin.services.configurate.starterFood
 import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
-import gg.tropic.uhc.plugin.services.map.mapNetherWorld
-import gg.tropic.uhc.plugin.services.map.mapWorld
+import gg.tropic.uhc.plugin.services.map.threadlock.ThreadLockUtilities
 import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
 import gg.tropic.uhc.plugin.services.scenario.menu.ScenarioMenu
 import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
 import me.lucko.helper.Events
-import me.lucko.helper.Schedulers
 import me.lucko.helper.utils.Players
-import me.lucko.helper.scheduler.threadlock.ServerThreadLock
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -297,7 +293,7 @@ object ScatterService
                 // we calculate pre start time in ticks so we're
                 // going to convert it to 20, and add another second
                 StartingStateRunnable.PRE_START_TIME = (estimatePreStartTime() / 20) + 1
-                
+
                 thread {
                     while (
                         CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING &&
@@ -305,12 +301,10 @@ object ScatterService
                     )
                     {
                         val firstNotScattered = playersNotYetScattered.first()
-                        ServerThreadLock
-                            .obtain()
-                            .use {
-                                firstNotScattered.scatter()
-                            }
-                            
+                        ThreadLockUtilities.runMainLock {
+                            firstNotScattered.scatter()
+                        }
+
                         sleep(50L)
                     }
                 }

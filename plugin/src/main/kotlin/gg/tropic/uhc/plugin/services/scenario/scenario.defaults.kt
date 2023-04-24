@@ -89,7 +89,7 @@ val bloodEnchants = object : GameScenario(
             event.player.damage(
                 (event.oldLevel - event.newLevel) * 0.5
             )
-        } 
+        }
     }
 }
 
@@ -892,7 +892,7 @@ val doubleOres = object : GameScenario(
     "Players receive double the ores and food when mined/harvested."
 )
 {
-`
+
 }
 
 val webCage = object : GameScenario(
