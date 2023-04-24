@@ -34,14 +34,14 @@ inline fun <reified V : Any> configurable(
 val absorption = configurable(
     "Absorption",
     ItemStack(Material.GOLDEN_CARROT),
-    "Should Absorption be enabled when data eat golden apples?",
+    "Should players be given absorption when they eat golden apples?",
     true
 )
 
 val borderShrink = configurable(
     "Border Shrink Interval",
     ItemStack(Material.PAPER),
-    "How often does the world border shrink. (in minutes)",
+    "How often does the world border shrink? (in minutes)",
     1,
     3,
     5,
@@ -59,14 +59,15 @@ val initialBorderSize = configurable(
 val borderDecreaseAmount = configurable(
     "Border Decrease Amount",
     ItemStack(Material.HOPPER),
-    "How much should we decrease the border by?",
-    50
+    "How much should we decrease the border size by?",
+    100
 )
 
 val finalHeal = configurable(
     "Final Heal",
     ItemStack(Material.SPECKLED_MELON),
-    "What time should all players be healed? (in minutes)",
+    "At what time should final heal occur at? (in minutes)",
+    3,
     1,
     5,
     10,
@@ -78,8 +79,8 @@ val finalHeal = configurable(
 val firstShrink = configurable(
     "First Shrink",
     ItemStack(Material.BEDROCK),
-    "What time should the first border shrink. (in minutes)",
-    9,
+    "At what time should the border first shrink? (in minutes)",
+    5,
     1,
     5,
     10,
@@ -119,7 +120,7 @@ val goldenHeads = configurable(
 val invisibilityPotions = configurable(
     "Invisibility Potions",
     ItemStack(Material.POTION, 1, 8238.toShort()),
-    "Should players be able to brew invisibility potions at all?",
+    "Should players be able to brew invisibility potions?",
     true
 )
 
@@ -140,7 +141,7 @@ val pearlDamage = configurable(
 val gracePeriod = configurable(
     "Grace Period Duration",
     ItemStack(Material.DIAMOND_SWORD),
-    "How long should the PvP Period last? (in minutes)",
+    "How long should grace period last? (in minutes)",
     3,
     5,
     10,
@@ -158,28 +159,30 @@ val gracePeriod = configurable(
 val speedPotions = configurable(
     "Speed Potions",
     ItemStack(Material.POTION, 1, 8194.toShort()),
-    "Should players be able to brew speed potions at all?",
+    "Should players be able to brew speed potions?",
     true
 )
 
 val strengthPotions = configurable(
     "Strength Potions",
     ItemStack(Material.POTION, 1, 8201.toShort()),
-    "Should players be able to brew strength potions at all?",
+    "Should players be able to brew strength potions?",
     true
 )
 
 val starterFood = configurable(
     "Starter Food",
     ItemStack(Material.COOKED_BEEF),
-    "How much steak should players receive on uhc start?",
+    "How much steak should players receive when the game starts?",
     0,
+    5,
     10,
     16,
     32,
     64
 )
 
+// continue
 val flatMeetup = configurable(
     "Flat 25x25",
     ItemStack(Material.GRASS),
