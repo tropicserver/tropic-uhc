@@ -3,6 +3,7 @@ package gg.tropic.uhc.plugin.services.border
 import gg.tropic.uhc.plugin.engine.CountdownRunnable
 import gg.tropic.uhc.plugin.services.configurate.borderDecreaseAmount
 import gg.tropic.uhc.plugin.services.configurate.borderShrink
+import gg.tropic.uhc.plugin.services.configurate.finalShrinkAmount
 import gg.tropic.uhc.plugin.services.configurate.firstShrink
 import gg.tropic.uhc.plugin.services.configurate.firstShrinkAmount
 import gg.tropic.uhc.plugin.services.configurate.flatMeetup
@@ -109,7 +110,7 @@ object BorderUpdateEventExecutor
 
             // checks if this runnable is not
             // handling the last border update
-            if (next != (if (flatMeetup.value) 25 else 10))
+            if (next != (if (flatMeetup.value) 25 else finalShrinkAmount.value))
             {
                 currentBorderUpdater = BorderUpdateRunnable(
                     borderShrink.value * 60,

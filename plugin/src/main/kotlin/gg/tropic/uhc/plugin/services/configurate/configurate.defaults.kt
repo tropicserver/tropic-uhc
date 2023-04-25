@@ -103,6 +103,16 @@ val firstShrinkAmount = configurable(
     250
 )
 
+val finalShrinkAmount = configurable(
+    "Final Shrink Amount",
+    ItemStack(Material.BLAZE_POWDER),
+    "To what number should the final shrink go down to?",
+    50,
+    10,
+    25,
+    50
+)
+
 val godApples = configurable(
     "God Apples",
     ItemStack(Material.GOLDEN_APPLE, 1, 1.toShort()),
