@@ -707,7 +707,7 @@ val timeBomb = object : GameScenario(
                     terminable.closeAndReportException()
 
                     where.world.spigot().strikeLightning(where, true)
-                    where.world.createExplosion(where, 8f)
+                    where.world.createExplosion(where, 4f)
 
                     Bukkit.broadcastMessage("${CC.GREEN}${entity.name}'s${CC.SEC} corpse exploded!")
                 }, 30L * 20)
