@@ -55,8 +55,10 @@ object HostCommand : ScalaCommand()
         }
 
         HostService.gameHost = player.uniqueId
-        player.bukkit().chat("/spectate confirm")
-        player.sendMessage("$prefix${CC.GREEN}You're now the game's host.")
+        player.sendMessage(
+            "$prefix${CC.GREEN}You're now the game's host.",
+            "$prefix${CC.GRAY}Use /spectate to enter spectator mode before the game/scatter starts.",
+        )
 
         Bukkit.broadcastMessage(
             "$prefix${CC.B_GREEN}${player.bukkit().name}${CC.GREEN} is now the host."

@@ -74,6 +74,9 @@ object ScatterService
     @Configure
     fun configure()
     {
+        // whitelist by default to prevent non-hosts from logging in
+        Bukkit.setWhitelist(true)
+
         Events
             .subscribe(PlayerDropItemEvent::class.java)
             .filter {
