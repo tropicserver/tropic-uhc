@@ -67,7 +67,7 @@ class HostSetupMenu : Menu("Game Setup")
                 }
 
             this[5] = ItemBuilder
-                .of(Material.FIREBALL)
+                .of(Material.ARROW)
                 .name("${CC.GREEN}Game Mode")
                 .addToLore(
                     "${CC.GRAY}Set the game team mode",

@@ -2,6 +2,8 @@ package gg.tropic.uhc.plugin.services.scenario
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.states.CgsGameState
+import gg.tropic.uhc.plugin.engine.CountdownRunnable
+import gg.tropic.uhc.plugin.engine.createControlledRunner
 import gg.tropic.uhc.plugin.services.configurate.oresToInventory
 import gg.tropic.uhc.plugin.services.map.MapGenerationService.plugin
 import me.lucko.helper.Events
@@ -14,6 +16,7 @@ import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Chest
@@ -25,8 +28,10 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.event.enchantment.EnchantItemEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityDeathEvent
@@ -37,11 +42,13 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.inventory.InventoryType.SlotType
 import org.bukkit.event.inventory.PrepareItemCraftEvent
+import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerLevelChangeEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
+import java.util.UUID
 
 /**
  * @author GrowlyX
@@ -114,7 +121,10 @@ val bareBones = object : GameScenario(
                 event.isCancelled = true
                 event.view.player.sendMessage("${CC.RED}You cannot craft this because BareBones is enabled!")
             }
-            else -> {}
+
+            else ->
+            {
+            }
         }
     }
 
@@ -143,21 +153,21 @@ val coldWeapons = object : GameScenario(
         }
     }
 
-/*    @EventHandler
-    fun onPrepareAnvilRepair(event: PrepareAnvilRepairEvent)
-    {
-        if (event.getResult().getEnchantments().containsKey(Enchantment.FIRE_ASPECT) || event.getResult()
-                .getEnchantments().containsKey(Enchantment.ARROW_FIRE)
-        )
+    /*    @EventHandler
+        fun onPrepareAnvilRepair(event: PrepareAnvilRepairEvent)
         {
-            event.setCancelled(true)
-        }
-    }*/
+            if (event.getResult().getEnchantments().containsKey(Enchantment.FIRE_ASPECT) || event.getResult()
+                    .getEnchantments().containsKey(Enchantment.ARROW_FIRE)
+            )
+            {
+                event.setCancelled(true)
+            }
+        }*/
 
     @EventHandler
     fun onInventoryClick(event: InventoryClickEvent)
     {
-        if (event.inventory.type == InventoryType.ANVIL && event.slotType == InventoryType.SlotType.RESULT)
+        if (event.inventory.type == InventoryType.ANVIL && event.slotType == SlotType.RESULT)
         {
             // We're not canceling the event here because we dont want cancel enchanting item
             // We'll just remove FIRE enchantments.
@@ -330,7 +340,9 @@ val cutClean = object : GameScenario(
                     handleFrenzy(event.block, event.player, ItemStack(Material.TNT))
                 }
 
-                else -> {}
+                else ->
+                {
+                }
             }
         }
         when (event.block.type)
@@ -340,7 +352,10 @@ val cutClean = object : GameScenario(
                 event.isCancelled = true
                 handleSmelt(event.block, event.player)
             }
-            else -> {}
+
+            else ->
+            {
+            }
         }
     }
 
@@ -378,7 +393,9 @@ val cutClean = object : GameScenario(
                 event.drops.add(ItemStack(Material.GRILLED_PORK, dropRare))
             }
 
-            else -> {}
+            else ->
+            {
+            }
         }
     }
 
@@ -450,7 +467,9 @@ val cutClean = object : GameScenario(
                     data.limIron += 1
                 }
 
-                else -> {}
+                else ->
+                {
+                }
             }
         }
 
@@ -655,7 +674,11 @@ val timeBomb = object : GameScenario(
                     override fun getNewLines() = listOf(
                         "${CC.GREEN}${entity.name}'s corpse",
                         "${CC.RED}Explodes in ${
-                            DurationFormatUtils.formatDurationWords(explosionTime - System.currentTimeMillis(), true, true)
+                            DurationFormatUtils.formatDurationWords(
+                                explosionTime - System.currentTimeMillis(),
+                                true,
+                                true
+                            )
                         }"
                     )
 
@@ -954,6 +977,162 @@ val tripleOres = object : GameScenario(
 )
 {
 
+}
+
+val noCleanUsers = mutableMapOf<UUID, Pair<Long, CountdownRunnable>>()
+val noClean = object : GameScenario(
+    "No Clean",
+    ItemStack(Material.DIAMOND_SWORD),
+    "Players will receive 30 seconds of invincibility when they kill a player. Hostile action from the killer will cancel that timer if it is not yet over."
+)
+{
+    fun invalidateNoCleanTimer(uniqueId: UUID)
+    {
+        noCleanUsers[uniqueId]
+            ?.apply {
+                second.task?.closeAndReportException()
+            }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun onPlayerDeath(event: PlayerDeathEvent)
+    {
+        if (event.entity.killer != null)
+        {
+            if (isNotPlaying(event.entity.killer))
+            {
+                return
+            }
+
+            invalidateNoCleanTimer(event.entity.killer.uniqueId)
+
+            noCleanUsers[event.entity.killer.uniqueId] =
+                System.currentTimeMillis() + 31 * 1_000L to createControlledRunner(
+                    seconds = 31,
+                    end = {
+                        if (!event.entity.killer.isOnline)
+                        {
+                            it.task?.closeAndReportException()
+                            return@createControlledRunner
+                        }
+
+                        event.entity.killer.sendMessage(
+                            "${CC.RED}Your No Clean timer has expired. You are no longer invincible!"
+                        )
+                        event.entity.killer.playSound(
+                            event.entity.killer.location,
+                            Sound.NOTE_PLING, 1.0f, 1.0f
+                        )
+                    },
+                    update = { seconds, task ->
+                        if (!event.entity.killer.isOnline)
+                        {
+                            task.task?.closeAndReportException()
+                            return@createControlledRunner
+                        }
+
+                        event.entity.killer.sendMessage(
+                            "${CC.RED}Your No Clean timer expires in $seconds seconds."
+                        )
+                    }
+                ).apply {
+                    task?.bindWith(
+                        CompositeTerminable.create()
+                            .with {
+                                noCleanUsers.remove(event.entity.killer.uniqueId)
+                            }
+                    )
+                }
+        }
+    }
+
+    @EventHandler
+    fun onEntityDamageByEntity(event: EntityDamageByEntityEvent)
+    {
+        if (event.entity is Player && event.damager is Player)
+        {
+            val player = event.entity as Player
+
+            if (isNotPlaying(player))
+            {
+                return
+            }
+
+            val damager = event.damager as Player
+
+            if (isNotPlaying(damager))
+            {
+                return
+            }
+
+            if (player.activeNoClean != null)
+            {
+                damager.sendMessage("${CC.RED}${player.name} is invincible due to their No Clean timer!")
+                event.isCancelled = true
+                return
+            }
+
+            if (damager.activeNoClean != null)
+            {
+                invalidateNoCleanTimer(damager.uniqueId)
+                damager.sendMessage("${CC.RED}Your No Clean timer was expired due to hostile action!")
+            }
+        }
+    }
+
+    @EventHandler
+    fun onPlayerBucketEmpty(event: PlayerBucketEmptyEvent)
+    {
+        if (isNotPlaying(event.player))
+        {
+            return
+        }
+
+        if (event.player.activeNoClean != null)
+        {
+            if (event.bucket != Material.WATER_BUCKET)
+            {
+                invalidateNoCleanTimer(event.player.uniqueId)
+                event.player.sendMessage("${CC.RED}Your No Clean timer was expired due to hostile action!")
+            }
+        }
+    }
+
+    @EventHandler
+    fun onBlockPlace(event: BlockPlaceEvent)
+    {
+        if (isNotPlaying(event.player))
+        {
+            return
+        }
+
+        if (event.player.activeNoClean != null)
+        {
+            if (event.block.type == Material.FIRE || event.block.type == Material.TNT)
+            {
+                invalidateNoCleanTimer(event.player.uniqueId)
+                event.player.sendMessage("${CC.RED}Your No Clean timer was expired due to hostile action!")
+            }
+        }
+    }
+
+    @EventHandler
+    fun onEntityDamage(event: EntityDamageEvent)
+    {
+        if (event.entity is Player)
+        {
+            val player = event.entity as Player
+            if (isNotPlaying(player))
+            {
+                return
+            }
+
+            if ((event.entity as Player).activeNoClean != null)
+            {
+                event.isCancelled = true
+            }
+        }
+    }
 }
 
 val tripleExp = object : GameScenario(

@@ -8,13 +8,13 @@ import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.util.QuickAccess.username
-import gg.scala.lemon.util.task.DiminutionRunnable
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
 import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
+import gg.tropic.uhc.plugin.services.scenario.activeNoClean
 import gg.tropic.uhc.plugin.services.teams.gameType
 import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
@@ -22,7 +22,6 @@ import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.math.Numbers
 import net.evilblock.cubed.util.time.TimeUtil
 import org.bukkit.Bukkit
-import org.bukkit.Color
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -104,6 +103,15 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                     if (BorderUpdateEventExecutor.currentBorderUpdater != null)
                         " ${CC.GRAY}(${TimeUtil.formatIntoAbbreviatedString(BorderUpdateEventExecutor.currentBorderUpdater!!.seconds)})" else ""
                 }"
+
+                player.activeNoClean
+                    ?.apply {
+                        lines += ""
+                        lines += "${CC.GOLD}Cooldowns:"
+                        lines += "${CC.WHITE}No Clean: ${CC.GOLD}${
+                            (first - System.currentTimeMillis()) / 1000
+                        }s"
+                    }
             }
 
             CgsGameState.ENDED ->
@@ -130,6 +138,31 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
         lines += ""
         lines += "${CC.GRAY}${LemonConstants.WEB_LINK} $footerPadding"
     }
+}
+
+fun createControlledRunner(
+    seconds: Int,
+    end: (CountdownRunnable) -> Unit,
+    update: (Int, CountdownRunnable) -> Unit
+) = object : CountdownRunnable(seconds + 1)
+{
+    override fun getSeconds() = listOf(
+        18000, 14400, 10800, 7200, 3600, 2700, 1800,
+        900, 600, 300, 240, 180, 120, 60, 50, 40, 30,
+        15, 10, 5, 4, 3, 2, 1
+    )
+
+    override fun onEnd() = end(this)
+    override fun onRun() = update(this.seconds, this)
+}.apply {
+    Schedulers
+        .sync()
+        .runRepeating(
+            this, 0L, 20L
+        )
+        .let {
+            this.task = it
+        }
 }
 
 fun createRunner(

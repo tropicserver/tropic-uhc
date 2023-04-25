@@ -2,6 +2,7 @@ package gg.tropic.uhc.plugin.services.scenario
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
+import gg.tropic.uhc.plugin.engine.CountdownRunnable
 import gg.tropic.uhc.shared.player.UHCPlayerModel
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
@@ -14,6 +15,9 @@ import org.bukkit.entity.Player
  */
 val Player.playing: Boolean
     get() = !hasMetadata("spectator")
+
+val Player.activeNoClean: Pair<Long, CountdownRunnable>?
+    get() = noCleanUsers[uniqueId]
 
 val Player.profile: UHCPlayerModel
     get() = CgsGameEngine.INSTANCE
