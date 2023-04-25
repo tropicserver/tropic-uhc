@@ -18,6 +18,7 @@ import gg.scala.flavor.inject.Inject
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.map.mapWorld
 import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
+import gg.tropic.uhc.plugin.services.scenario.playing
 import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
 import gg.tropic.uhc.shared.player.UHCPlayerModel
@@ -132,5 +133,10 @@ object UHCCommand : ScalaCommand()
             "",
             "${CC.GRAY}Game Kills: ${CC.GREEN}${model.gameKills.value}"
         )
+
+        if (!target.player.playing)
+        {
+            player.sendMessage("${CC.D_GRAY}(this player is a spectator)")
+        }
     }
 }
