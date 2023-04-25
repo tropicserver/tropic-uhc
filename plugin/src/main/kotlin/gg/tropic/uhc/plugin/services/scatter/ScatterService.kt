@@ -3,6 +3,7 @@ package gg.tropic.uhc.plugin.services.scatter
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
+import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.game.command.SpectateCommand
@@ -32,6 +33,7 @@ import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -183,16 +185,32 @@ object ScatterService
             .bindWith(plugin)
 
         Events
-            .subscribe(PlayerJoinEvent::class.java)
+            .subscribe(CgsGameEngine.CgsGameParticipantConnectEvent::class.java)
             .filter {
                 CgsGameEngine.INSTANCE.gameState == CgsGameState.WAITING
             }
             .handler {
-                it.player.sendMessage("$prefix${CC.GREEN}Welcome to ${LemonConstants.SERVER_NAME}'s UHC!")
-                it.player.sendMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
-                it.player.sendMessage("$prefix${CC.WHITE}Today's game host: ${hostDisplayName()}")
+                it.participant.sendMessage("$prefix${CC.GREEN}Welcome to ${LemonConstants.SERVER_NAME}'s UHC!")
+                it.participant.sendMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
+                it.participant.sendMessage("$prefix${CC.WHITE}Today's game host: ${hostDisplayName()}")
 
-                it.player.applyLobbyItems()
+                it.participant.applyLobbyItems()
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(CgsGameEngine.CgsGameParticipantConnectEvent::class.java)
+            .filter {
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING
+            }
+            .handler {
+                CgsSpectatorHandler.setSpectator(
+                    it.participant, false
+                )
+
+                delayed(1L) {
+                    it.participant.sendMessage("${CC.D_RED}✘ ${CC.RED}This is due to your late connection to the server. Players are already being scattered.")
+                }
             }
             .bindWith(plugin)
 
