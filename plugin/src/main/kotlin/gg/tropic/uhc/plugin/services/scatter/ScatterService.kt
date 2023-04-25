@@ -5,6 +5,7 @@ import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
+import gg.scala.cgs.game.command.SpectateCommand
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -95,6 +96,28 @@ object ScatterService
             }
             .bindWith(plugin)
 
+        Events
+            .subscribe(CgsGameEngine.CgsGamePreStartCancelEvent::class.java)
+            .handler {
+                Bukkit.getOnlinePlayers()
+                    .forEach {
+                        it.sit(false)
+
+                        if (it.world.name == "uhc_world")
+                        {
+                            it.teleport(
+                                CgsGameEngine.INSTANCE.gameArena!!
+                                    .getPreLobbyLocation()
+                            )
+                        }
+                    }
+
+                Bukkit.broadcastMessage(
+                    "$prefix${CC.RED}The game is no longer starting due to a lack of players!"
+                )
+            }
+            .bindWith(plugin)
+
         fun Player.applyLobbyItems()
         {
             Tasks.delayed(3L) {
@@ -129,6 +152,19 @@ object ScatterService
             }
             .handler {
                 it.spectator.applyLobbyItems()
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(CgsGameEngine.CgsGameSpectatorAddEvent::class.java)
+            .filter {
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING
+            }
+            .handler {
+                it.spectator.sit(false)
+                it.spectator.teleport(
+                    CgsGameEngine.INSTANCE.gameArena!!.getSpectatorLocation()
+                )
             }
             .bindWith(plugin)
 
