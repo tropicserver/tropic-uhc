@@ -40,9 +40,8 @@ object HostService
             .handler {
                 if (it.player.hasPermission("uhc.command.host"))
                 {
-                    it.player.chat("/host")
-
                     delayed(1L) {
+                        it.player.chat("/host")
                         HostSetupMenu().openMenu(it.player)
                     }
                 }
