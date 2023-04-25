@@ -1,5 +1,6 @@
 package gg.tropic.uhc.plugin.engine.commands
 
+import gg.scala.cgs.common.player.statistic.value.CgsGameStatistic
 import gg.scala.cgs.game.command.ForceStartCommand
 import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.annotation.CommandAlias
@@ -16,10 +17,14 @@ import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.flavor.inject.Inject
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.map.mapWorld
+import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
 import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
+import gg.tropic.uhc.shared.player.UHCPlayerModel
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 
 /**
@@ -76,18 +81,56 @@ object UHCCommand : ScalaCommand()
         )
     }
 
-    @Subcommand("game-stats")
-    @Description("View current game stats for a player.")
-    fun onGameStats(player: ScalaPlayer, target: OnlinePlayer)
+    enum class TopCategory(
+        val sortValue: (UHCPlayerModel) -> CgsGameStatistic
+    )
+    {
+        Coal(UHCPlayerModel::coalMined),
+        Lapis(UHCPlayerModel::lapisMined),
+        Gold(UHCPlayerModel::goldMined),
+        Diamonds(UHCPlayerModel::diamondsMined),
+        Iron(UHCPlayerModel::ironMined),
+        Spawners(UHCPlayerModel::spawnersMined),
+        Kills(UHCPlayerModel::gameKills)
+    }
+
+    @Subcommand("player top")
+    @Description("View top 10 leaderboards for certain statistics.")
+    fun onPlayerTop(player: ScalaPlayer, category: TopCategory)
+    {
+        val topTenPlayers = remainingPlayers
+            .sortedByDescending {
+                category.sortValue(it.profile).value
+            }
+            .take(10)
+
+        player.sendMessage(
+            "${CC.GREEN}Top 10 leaderboards for ${category.name}:",
+            *topTenPlayers
+                .mapIndexed { index, topPlayer ->
+                    "${CC.GREEN}#${index + 1} ${CC.GRAY}- ${CC.WHITE}${topPlayer.name} ${CC.GRAY}- ${CC.WHITE}${
+                        Numbers.format(category.sortValue(topPlayer.profile).value)
+                    }"
+                }
+                .toTypedArray()
+        )
+    }
+
+    @Subcommand("player stats")
+    @Description("View game stats for a player.")
+    fun onPlayerStats(player: ScalaPlayer, target: OnlinePlayer)
     {
         val model = target.player.profile
         player.sendMessage(
-            "${CC.GREEN}${target.player.name}'s statistics:",
+            "${CC.GREEN}${target.player.name}'s game statistics:",
             "${CC.GRAY}Coal Mined: ${CC.GREEN}${model.coalMined.value}",
             "${CC.GRAY}Lapis Mined: ${CC.GREEN}${model.lapisMined.value}",
             "${CC.GRAY}Gold Mined: ${CC.GREEN}${model.goldMined.value}",
             "${CC.GRAY}Diamond Mined: ${CC.GREEN}${model.diamondsMined.value}",
             "${CC.GRAY}Iron Mined: ${CC.GREEN}${model.ironMined.value}",
+            "${CC.GRAY}Spawners Mined: ${CC.GREEN}${model.spawnersMined.value}",
+            "",
+            "${CC.GRAY}Game Kills: ${CC.GREEN}${model.gameKills.value}"
         )
     }
 }
