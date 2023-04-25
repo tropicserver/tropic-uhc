@@ -170,7 +170,7 @@ object WorldBorderService
 
         Bukkit.getOnlinePlayers().forEach { player: Player? ->
             val location = player!!.location
-            player!!.teleport(
+            player.teleport(
                 Location(
                     location.world,
                     location.x,

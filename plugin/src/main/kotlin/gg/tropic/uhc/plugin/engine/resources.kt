@@ -15,6 +15,7 @@ import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
 import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
+import gg.tropic.uhc.plugin.services.teams.gameType
 import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
 import net.evilblock.cubed.util.CC
@@ -60,7 +61,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
-                lines += "${CC.WHITE}Mode: ${CC.PRI}FFA"
+                lines += "${CC.WHITE}Mode: ${CC.PRI}${gameType.name}"
                 lines += "${CC.WHITE}Players: ${CC.PRI}${
                     Bukkit.getOnlinePlayers().size
                 }/${
@@ -77,7 +78,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                 }"
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
-                lines += "${CC.WHITE}Mode: ${CC.PRI}FFA"
+                lines += "${CC.WHITE}Mode: ${CC.PRI}${gameType.name}"
             }
 
             CgsGameState.STARTED ->
