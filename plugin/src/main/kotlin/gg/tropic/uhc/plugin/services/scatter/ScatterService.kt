@@ -122,7 +122,7 @@ object ScatterService
 
         fun Player.applyLobbyItems()
         {
-            Tasks.delayed(3L) {
+            delayed(4L) {
                 inventory.setItem(
                     0, ItemBuilder
                         .of(Material.BOOK)
@@ -132,15 +132,21 @@ object ScatterService
 
                 inventory.setItem(
                     1, ItemBuilder
-                        .of(Material.EYE_OF_ENDER)
-                        .name("${CC.GOLD}Scenarios ${CC.GRAY}(Right Click)")
+                        .of(Material.JUKEBOX)
+                        .name("${CC.D_AQUA}Scenarios ${CC.GRAY}(Right Click)")
                         .build()
                 )
 
                 inventory.setItem(
                     8, ItemBuilder
-                        .of(XMaterial.GRAY_DYE)
-                        .name("${CC.GRAY}Spectate ${CC.GRAY}(Right Click)")
+                        .of(XMaterial.FIRE_CHARGE)
+                        .name("${CC.AQUA}Settings ${CC.GRAY}(Right Click)")
+                        .build()
+                )
+                inventory.setItem(
+                    4, ItemBuilder
+                        .of(XMaterial.FIRE_CHARGE)
+                        .name("${CC.GREEN}Spectate ${CC.GRAY}(Right Click)")
                         .build()
                 )
                 updateInventory()
@@ -218,7 +224,8 @@ object ScatterService
             .subscribe(PlayerInteractEvent::class.java)
             .filter {
                 it.hasItem() && it.action.name.contains("RIGHT") && it.clickedBlock == null &&
-                        CgsGameEngine.INSTANCE.gameState == CgsGameState.WAITING
+                        CgsGameEngine.INSTANCE.gameState == CgsGameState.WAITING &&
+                        !it.player.hasMetadata("spectating")
             }
             .handler {
                 when (it.item!!.type)
@@ -228,14 +235,19 @@ object ScatterService
                         ConfigurateMenu().openMenu(it.player)
                     }
 
-                    Material.EYE_OF_ENDER ->
+                    Material.JUKEBOX ->
                     {
                         ScenarioMenu().openMenu(it.player)
                     }
 
-                    Material.INK_SACK ->
+                    Material.FIREBALL ->
                     {
                         it.player.chat("/spectate confirm")
+                    }
+
+                    Material.REDSTONE_COMPARATOR ->
+                    {
+                        it.player.chat("/settings")
                     }
 
                     else ->
