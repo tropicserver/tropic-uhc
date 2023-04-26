@@ -988,7 +988,7 @@ val noClean = object : GameScenario(
 {
     fun invalidateNoCleanTimer(uniqueId: UUID)
     {
-        noCleanUsers[uniqueId]
+        noCleanUsers.remove(uniqueId)
             ?.apply {
                 second.task?.closeAndReportException()
             }
@@ -1021,7 +1021,7 @@ val noClean = object : GameScenario(
                             "${CC.RED}Your No Clean timer has expired. You are no longer invincible!"
                         )
                         killer.playSound(
-                            event.entity.killer.location,
+                            killer.location,
                             Sound.NOTE_PLING, 1.0f, 1.0f
                         )
                     },
