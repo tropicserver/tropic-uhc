@@ -26,7 +26,7 @@ class UHCGameLobby : CgsGameLobby<UHCPlayerModel>(UHCPlayerModel::class)
     override fun getFormattedButton(info: CgsServerInstance, player: Player) =
         ItemBuilder
             .of(Material.BOOK_AND_QUILL)
-            .name("${CC.GREEN}${info.internalServerId}")
+            .name("${CC.GREEN}UHC Game ${info.internalServerId}")
             .addToLore(
                 "${CC.GRAY}Alive: ${info.gameServerInfo!!.participants.size}",
                 "",
@@ -89,7 +89,7 @@ class UHCGameLobby : CgsGameLobby<UHCPlayerModel>(UHCPlayerModel::class)
             )
 
             lines += ""
-            lines += "${CC.GOLD}Statistics:"
+            lines += "${CC.GOLD}UHC:"
             lines += " Kills: ${CC.GOLD}${stats.kills.value}"
             lines += " Wins: ${CC.GOLD}${stats.wins.value}"
             lines += " Losses: ${CC.GOLD}${stats.losses.value}"
@@ -98,7 +98,7 @@ class UHCGameLobby : CgsGameLobby<UHCPlayerModel>(UHCPlayerModel::class)
             lines += "${CC.GRAY}${LemonConstants.WEB_LINK} $footerPadding"
         }
 
-        override fun getTitle(player: Player) = "${CC.B_PRI}UHC"
+        override fun getTitle(player: Player) = "${CC.B_PINK}The Arcade"
     }
 
     override fun getScoreboardAdapter() = scoreboardAdapter
