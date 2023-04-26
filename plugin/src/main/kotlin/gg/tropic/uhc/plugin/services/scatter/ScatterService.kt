@@ -139,7 +139,7 @@ object ScatterService
 
                 inventory.setItem(
                     8, ItemBuilder
-                        .of(XMaterial.FIRE_CHARGE)
+                        .of(Material.REDSTONE_COMPARATOR)
                         .name("${CC.AQUA}Settings ${CC.GRAY}(Right Click)")
                         .build()
                 )
