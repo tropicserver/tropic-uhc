@@ -668,7 +668,7 @@ val timeBomb = object : GameScenario(
                 val explosionTime = System.currentTimeMillis() + 1000L * 30
                 val hologram = object : UpdatingHologramEntity(
                     text = "${CC.GREEN}${entity.name}'s corpse",
-                    location = chest.location.clone().add(1.0, 1.8, 0.5)
+                    location = chest.location.clone().add(1.0, 1.8 - 2.0, 0.5)
                 )
                 {
                     override fun getNewLines() = listOf(
@@ -1004,34 +1004,35 @@ val noClean = object : GameScenario(
                 return
             }
 
+            val killer = event.entity.killer
             invalidateNoCleanTimer(event.entity.killer.uniqueId)
 
             noCleanUsers[event.entity.killer.uniqueId] =
                 System.currentTimeMillis() + 31 * 1_000L to createControlledRunner(
                     seconds = 31,
                     end = {
-                        if (!event.entity.killer.isOnline)
+                        if (!killer.isOnline)
                         {
                             it.task?.closeAndReportException()
                             return@createControlledRunner
                         }
 
-                        event.entity.killer.sendMessage(
+                        killer.sendMessage(
                             "${CC.RED}Your No Clean timer has expired. You are no longer invincible!"
                         )
-                        event.entity.killer.playSound(
+                        killer.playSound(
                             event.entity.killer.location,
                             Sound.NOTE_PLING, 1.0f, 1.0f
                         )
                     },
                     update = { seconds, task ->
-                        if (!event.entity.killer.isOnline)
+                        if (!killer.isOnline)
                         {
                             task.task?.closeAndReportException()
                             return@createControlledRunner
                         }
 
-                        event.entity.killer.sendMessage(
+                        killer.sendMessage(
                             "${CC.RED}Your No Clean timer expires in $seconds seconds."
                         )
                     }
@@ -1039,7 +1040,7 @@ val noClean = object : GameScenario(
                     task?.bindWith(
                         CompositeTerminable.create()
                             .with {
-                                noCleanUsers.remove(event.entity.killer.uniqueId)
+                                noCleanUsers.remove(killer.uniqueId)
                             }
                     )
                 }
