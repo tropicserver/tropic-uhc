@@ -15,6 +15,7 @@ import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.engine.createRunner
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
+import gg.tropic.uhc.plugin.services.border.WorldBorderService.ensureWithinBorderBounds
 import gg.tropic.uhc.plugin.services.configurate.finalHeal
 import gg.tropic.uhc.plugin.services.configurate.gracePeriod
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
@@ -201,6 +202,15 @@ object ScatterService
                 it.participant.sendMessage("$prefix${CC.WHITE}Today's game host: ${hostDisplayName()}")
 
                 it.participant.applyLobbyItems()
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(CgsGameEngine.CgsGameParticipantReinstateEvent::class.java)
+            .handler {
+                it.participant.ensureWithinBorderBounds(
+                    WorldBorderService.currentSize.toInt()
+                )
             }
             .bindWith(plugin)
 

@@ -66,6 +66,50 @@ object WorldBorderService
 
     private const val BOUND_OFFSET = 5.5
 
+    fun Player.ensureWithinBorderBounds(border: Int)
+    {
+        val maximum = border / 2
+        val minimum = -(maximum)
+
+        val location = location.clone()
+        var locationModified = false
+
+        if (location.x < minimum)
+        {
+            location.x = minimum + BOUND_OFFSET
+            locationModified = true
+        }
+
+        if (location.x > maximum)
+        {
+            location.x = maximum - BOUND_OFFSET
+            locationModified = true
+        }
+
+        if (location.z < minimum)
+        {
+            location.z = minimum + BOUND_OFFSET
+            locationModified = true
+        }
+
+        if (location.z > maximum)
+        {
+            location.z = maximum - BOUND_OFFSET
+            locationModified = true
+        }
+
+        if (locationModified)
+        {
+            location.y = location.world
+                .getHighestBlockYAt(location)
+                .toDouble()
+            location.y = location.y + 2.0
+
+            teleport(location)
+            playBorderBoundTeleportationEffects(this)
+        }
+    }
+
     fun ensurePlayersWithinBorderBounds(border: Int, world: String)
     {
         Players.all()
@@ -73,46 +117,7 @@ object WorldBorderService
                 it.world.name == world
             }
             .forEach {
-                val maximum = border / 2
-                val minimum = -(maximum)
-
-                val location = it.location.clone()
-                var locationModified = false
-
-                if (location.x < minimum)
-                {
-                    location.x = minimum + BOUND_OFFSET
-                    locationModified = true
-                }
-
-                if (location.x > maximum)
-                {
-                    location.x = maximum - BOUND_OFFSET
-                    locationModified = true
-                }
-
-                if (location.z < minimum)
-                {
-                    location.z = minimum + BOUND_OFFSET
-                    locationModified = true
-                }
-
-                if (location.z > maximum)
-                {
-                    location.z = maximum - BOUND_OFFSET
-                    locationModified = true
-                }
-
-                if (locationModified)
-                {
-                    location.y = location.world
-                        .getHighestBlockYAt(location)
-                        .toDouble()
-                    location.y = location.y + 2.0
-
-                    it.teleport(location)
-                    playBorderBoundTeleportationEffects(it)
-                }
+                it.ensureWithinBorderBounds(border)
             }
     }
 
