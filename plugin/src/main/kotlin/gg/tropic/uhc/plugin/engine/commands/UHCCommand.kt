@@ -25,7 +25,6 @@ import gg.tropic.uhc.shared.player.UHCPlayerModel
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.Location
-import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 
 /**

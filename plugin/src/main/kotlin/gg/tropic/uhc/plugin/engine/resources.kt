@@ -71,7 +71,7 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
             CgsGameState.STARTING ->
             {
                 lines += "${CC.GOLD}Scattering:"
-                lines += "${CC.WHITE}Scattered: ${CC.GOLD}${ScatterService.playersScattered.size}/${ScatterService.gameFillCount}"
+                lines += "${CC.WHITE}Scattered: ${CC.GOLD}${ScatterService.teamsScattered.size}/${ScatterService.gameFillCount}"
                 lines += "${CC.WHITE}Starts in: ${CC.GOLD}${
                     TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
                 }"

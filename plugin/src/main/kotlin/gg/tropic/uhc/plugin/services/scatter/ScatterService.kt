@@ -2,11 +2,11 @@ package gg.tropic.uhc.plugin.services.scatter
 
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.cgs.common.CgsGameEngine
-import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
-import gg.scala.cgs.game.command.SpectateCommand
+import gg.scala.cgs.common.teams.CgsGameTeam
+import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -26,28 +26,25 @@ import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.map.threadlock.ThreadLockUtilities
 import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
 import gg.tropic.uhc.plugin.services.scenario.menu.ScenarioMenu
-import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
 import gg.tropic.uhc.shared.UHCGameInfo
 import me.lucko.helper.Events
-import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import java.io.File
 import java.lang.Thread.sleep
-import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 /**
@@ -60,16 +57,25 @@ object ScatterService
     @Inject
     lateinit var plugin: TropicUHCPlugin
 
-    val playersScattered: List<Player>
-        get() = Players.all()
+    val scatteredTeams = mutableSetOf<Int>()
+
+    val populatedTeams: List<CgsGameTeam>
+        get() = CgsGameTeamService
+            .teams.values
             .filter {
-                it.hasMetadata("scattered")
+                it.participants.isNotEmpty()
             }
 
-    val playersNotYetScattered: List<Player>
-        get() = Players.all()
+    val teamsScattered: List<CgsGameTeam>
+        get() = scatteredTeams
+            .map {
+                CgsGameTeamService.teams[it]!!
+            }
+
+    val teamsNotYetScattered: List<CgsGameTeam>
+        get() = populatedTeams
             .filter {
-                !it.hasMetadata("scattered") && !it.hasMetadata("spectator")
+                it.id !in scatteredTeams && it.alive.isNotEmpty()
             }
 
     var gameFillCount = 0
@@ -89,35 +95,6 @@ object ScatterService
             }
             .handler {
                 it.isCancelled = true
-            }
-            .bindWith(plugin)
-
-        Events
-            .subscribe(CgsGameEngine.CgsGameEndEvent::class.java)
-            .handler {
-                File(Bukkit.getWorldContainer(), "tropic.uhc.lock").delete()
-            }
-            .bindWith(plugin)
-
-        Events
-            .subscribe(CgsGameEngine.CgsGamePreStartCancelEvent::class.java)
-            .handler {
-                Bukkit.getOnlinePlayers()
-                    .forEach {
-                        it.sit(false)
-
-                        if (it.world.name == "uhc_world")
-                        {
-                            it.teleport(
-                                CgsGameEngine.INSTANCE.gameArena!!
-                                    .getPreLobbyLocation()
-                            )
-                        }
-                    }
-
-                Bukkit.broadcastMessage(
-                    "$prefix${CC.RED}The game is no longer starting due to a lack of players!"
-                )
             }
             .bindWith(plugin)
 
@@ -153,6 +130,36 @@ object ScatterService
                 updateInventory()
             }
         }
+
+        Events
+            .subscribe(CgsGameEngine.CgsGameEndEvent::class.java)
+            .handler {
+                File(Bukkit.getWorldContainer(), "tropic.uhc.lock").delete()
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(CgsGameEngine.CgsGamePreStartCancelEvent::class.java)
+            .handler {
+                Bukkit.getOnlinePlayers()
+                    .forEach {
+                        it.sit(false)
+                        it.applyLobbyItems()
+
+                        if (it.world.name == "uhc_world")
+                        {
+                            it.teleport(
+                                CgsGameEngine.INSTANCE.gameArena!!
+                                    .getPreLobbyLocation()
+                            )
+                        }
+                    }
+
+                Bukkit.broadcastMessage(
+                    "$prefix${CC.RED}The game is no longer starting due to a lack of players!"
+                )
+            }
+            .bindWith(plugin)
 
         Events
             .subscribe(CgsGameEngine.CgsGameSpectatorRemoveEvent::class.java)
@@ -215,11 +222,16 @@ object ScatterService
             .bindWith(plugin)
 
         Events
-            .subscribe(CgsGameEngine.CgsGameParticipantConnectEvent::class.java)
+            .subscribe(
+                CgsGameEngine.CgsGameParticipantConnectEvent::class.java,
+                EventPriority.HIGHEST
+            )
             .filter {
                 CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING
             }
             .handler {
+                it.isCancelled = true
+
                 CgsSpectatorHandler.setSpectator(
                     it.participant, false
                 )
@@ -272,23 +284,9 @@ object ScatterService
             .handler {
                 Bukkit.setWhitelist(false)
 
-                playersScattered
+                teamsScattered
                     .forEach {
-                        unsitPlayer(it)
-
-                        it.profile.apply {
-                            limDiamond = 0
-                            limGold = 0
-                            limIron = 0
-
-                            ironMined.reset()
-                            lapisMined.reset()
-                            redstoneMined.reset()
-                            spawnersMined.reset()
-                            coalMined.reset()
-                            diamondsMined.reset()
-                            goldMined.reset()
-                        }
+                        it.participants
                     }
 
                 Bukkit.broadcastMessage("$prefix${CC.GRAY}This gamemode is currently in BETA!")
@@ -380,10 +378,10 @@ object ScatterService
                 thread {
                     while (
                         CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING &&
-                        playersNotYetScattered.isNotEmpty()
+                        teamsNotYetScattered.isNotEmpty()
                     )
                     {
-                        val firstNotScattered = playersNotYetScattered.first()
+                        val firstNotScattered = teamsNotYetScattered.first()
                         ThreadLockUtilities.runMainLock {
                             firstNotScattered.scatter()
                         }
@@ -400,12 +398,15 @@ object ScatterService
      * scattered. We also add 10 seconds to compensate for any lag/other issues
      * that may occur and delay the scattering process.
      */
-    fun estimatePreStartTime() = (playersNotYetScattered.size * 5) + (20 * 20)
+    fun estimatePreStartTime() = (teamsNotYetScattered.size * 5) + (20 * 20)
 
-    fun Player.scatter()
+    fun Player.scatter(
+        scatterLocation: Location =
+            MapGenerationService.generateScatterLocation()
+    )
     {
         resetAttributes()
-        teleport(MapGenerationService.generateScatterLocation())
+        teleport(scatterLocation)
         sitPlayer(player = this)
 
         if (starterFood.value != 0)
@@ -414,10 +415,5 @@ object ScatterService
                 ItemStack(Material.COOKED_BEEF, starterFood.value)
             )
         }
-
-        setMetadata(
-            "scattered",
-            FixedMetadataValue(CgsGameEngine.INSTANCE.plugin, true)
-        )
     }
 }

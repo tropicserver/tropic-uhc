@@ -1,11 +1,15 @@
 package gg.tropic.uhc.plugin.services.scatter
 
 import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.teams.CgsGameTeam
+import gg.tropic.uhc.plugin.services.map.MapGenerationService
+import gg.tropic.uhc.plugin.services.scatter.ScatterService.scatter
 import me.lucko.helper.utils.Players
 import net.minecraft.server.v1_8_R3.EntityBat
 import net.minecraft.server.v1_8_R3.PacketPlayOutAttachEntity
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
@@ -22,6 +26,22 @@ val remainingPlayers: List<Player>
         .filter {
             !it.hasMetadata("spectator")
         }
+
+val CgsGameTeam.alivePlayers: List<Player>
+    get() = alive
+        .mapNotNull {
+            Bukkit.getPlayer(it)
+        }
+
+fun CgsGameTeam.scatter()
+{
+    val scatterLocation = MapGenerationService
+        .generateScatterLocation()
+
+    alivePlayers.forEach {
+        it.scatter(scatterLocation = scatterLocation)
+    }
+}
 
 fun Player.resetAttributes()
 {
