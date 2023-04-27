@@ -7,6 +7,7 @@ import gg.tropic.uhc.plugin.services.map.mapNetherWorld
 import gg.tropic.uhc.plugin.services.map.mapWorld
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.Tasks
 import org.bukkit.Bukkit
 import org.bukkit.Effect
 import org.bukkit.Location
@@ -31,21 +32,23 @@ object WorldBorderService
 
     fun pushSizeUpdate(size: Double)
     {
-        currentSize = size
+        Tasks.sync {
+            currentSize = size
 
-        listOf(mapWorld(), mapNetherWorld())
-            .forEach {
-                ensurePlayersWithinBorderBounds(
-                    border = size.toInt(), world = it.name
-                )
+            listOf(mapWorld(), mapNetherWorld())
+                .forEach {
+                    ensurePlayersWithinBorderBounds(
+                        border = size.toInt(), world = it.name
+                    )
+                }
+
+            synchronizeBukkitWorldBorder(size)
+
+            if (size <= 50)
+            {
+                BedrockBorderMechanism
+                    .configureBedrockBorder(size)
             }
-
-        synchronizeBukkitWorldBorder(size)
-
-        if (size <= 50)
-        {
-            BedrockBorderMechanism
-                .configureBedrockBorder(size)
         }
     }
 
