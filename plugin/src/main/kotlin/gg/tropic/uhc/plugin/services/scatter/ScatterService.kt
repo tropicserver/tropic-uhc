@@ -27,6 +27,7 @@ import gg.tropic.uhc.plugin.services.map.threadlock.ThreadLockUtilities
 import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
 import gg.tropic.uhc.plugin.services.scenario.menu.ScenarioMenu
 import gg.tropic.uhc.plugin.services.styles.prefix
+import gg.tropic.uhc.plugin.services.teams.gameType
 import gg.tropic.uhc.shared.UHCGameInfo
 import me.lucko.helper.Events
 import net.evilblock.cubed.util.CC
@@ -206,7 +207,16 @@ object ScatterService
             .handler {
                 it.participant.sendMessage("$prefix${CC.GREEN}Welcome to ${LemonConstants.SERVER_NAME}'s UHC!")
                 it.participant.sendMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
-                it.participant.sendMessage("$prefix${CC.WHITE}Today's game host: ${hostDisplayName()}")
+
+                if (gameType.teamSize < 2)
+                {
+                    it.participant.sendMessage("$prefix${CC.WHITE}Today's game host: ${hostDisplayName()}")
+                } else
+                {
+                    it.participant.sendMessage(
+                        "$prefix${CC.PINK}You've joined a team-based ${gameType.name} game. Use ${CC.WHITE}/team${CC.PINK} to form your team before the game starts."
+                    )
+                }
 
                 it.participant.applyLobbyItems()
             }
