@@ -1,10 +1,12 @@
 package gg.tropic.uhc.plugin.services.configurate.menu
 
+import com.cryptomorin.xseries.XMaterial
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.states.CgsGameState
 import gg.tropic.uhc.plugin.services.configurate.Configurable
 import gg.tropic.uhc.plugin.services.configurate.configurables
 import gg.tropic.uhc.plugin.services.hosting.isHost
+import gg.tropic.uhc.plugin.services.hosting.menu.HostSetupMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
@@ -39,6 +41,41 @@ class ConfigurateMenu : PaginatedMenu()
 
     override fun getAllPagesButtonSlots() = slots
     override fun getMaxItemsPerPage(player: Player) = slots.size
+
+    override fun getGlobalButtons(player: Player) =
+        mutableMapOf<Int, Button>().apply {
+            if (!player.isHost())
+            {
+                return@apply
+            }
+
+            this[4] = ItemBuilder
+                .of(XMaterial.GREEN_STAINED_GLASS_PANE)
+                .name("${CC.GREEN}Game Setup")
+                .addToLore(
+                    "${CC.GRAY}Configure core game",
+                    "${CC.GRAY}options such as:",
+                    "${CC.WHITE}- max player count",
+                    "${CC.WHITE}- team size",
+                    "",
+                    "${CC.GREEN}Click to open!"
+                )
+                .toButton { _, _ ->
+                    if (!player.isHost())
+                    {
+                        player.sendMessage("${CC.RED}You must be the game host to use this!")
+                        return@toButton
+                    }
+
+                    if (CgsGameEngine.INSTANCE.gameState != CgsGameState.WAITING)
+                    {
+                        player.sendMessage("${CC.RED}You cannot use this feature at this time!")
+                        return@toButton
+                    }
+
+                    HostSetupMenu().openMenu(player)
+                }
+        }
 
     override fun getAllPagesButtons(player: Player) =
         mutableMapOf<Int, Button>().apply {
