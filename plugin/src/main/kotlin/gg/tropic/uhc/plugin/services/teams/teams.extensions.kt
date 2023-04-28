@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
  * @author GrowlyX
  * @since 4/25/2023
  */
-const val allowGameTypeEditing = false
+const val allowGameTypeEditing = true
 var gameType = GameTeamType.FFA
 
 fun GameTeamType.compatibleWith(maxCount: Int) =
