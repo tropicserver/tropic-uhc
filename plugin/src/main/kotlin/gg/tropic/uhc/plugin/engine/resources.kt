@@ -20,6 +20,7 @@ import gg.tropic.uhc.plugin.services.scenario.activeNoClean
 import gg.tropic.uhc.plugin.services.teams.gameType
 import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
+import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.math.Numbers
 import net.evilblock.cubed.util.time.TimeUtil
@@ -74,9 +75,11 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 lines += "${CC.GOLD}Scattering:"
                 lines += "${CC.WHITE}Scattered: ${CC.GOLD}${
-                    ScatterService.teamsScattered
-                        .map { it.alivePlayers }
-                        .count()
+                    Players.all()
+                        .filter { 
+                            it.hasMetadata("scattered")
+                        }
+                        .size
                 }/${ScatterService.gameFillCount}"
                 lines += "${CC.WHITE}Starts in: ${CC.GOLD}${
                     TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)

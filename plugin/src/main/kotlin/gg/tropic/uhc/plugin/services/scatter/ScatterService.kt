@@ -143,10 +143,13 @@ object ScatterService
         Events
             .subscribe(CgsGameEngine.CgsGamePreStartCancelEvent::class.java)
             .handler {
+                scatteredTeams.clear()
+
                 Bukkit.getOnlinePlayers()
                     .forEach {
                         it.sit(false)
                         it.applyLobbyItems()
+                        it.removeMetadata("scattered", plugin)
 
                         if (it.world.name == "uhc_world")
                         {
@@ -444,5 +447,10 @@ object ScatterService
                 ItemStack(Material.COOKED_BEEF, starterFood.value)
             )
         }
+
+        setMetadata(
+            "scattered",
+            FixedMetadataValue(plugin, true)
+        )
     }
 }
