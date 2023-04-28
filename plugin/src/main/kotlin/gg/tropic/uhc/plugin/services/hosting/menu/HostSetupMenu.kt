@@ -1,5 +1,8 @@
 package gg.tropic.uhc.plugin.services.hosting.menu
 
+import com.cryptomorin.xseries.XMaterial
+import gg.tropic.uhc.plugin.services.styles.prefix
+import gg.tropic.uhc.plugin.services.teams.GameTeamService
 import gg.tropic.uhc.plugin.services.teams.GameTeamType
 import gg.tropic.uhc.plugin.services.teams.allowGameTypeEditing
 import gg.tropic.uhc.plugin.services.teams.compatibleWith
@@ -8,6 +11,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -20,6 +24,10 @@ import org.bukkit.entity.Player
  */
 class HostSetupMenu : Menu("Game Setup")
 {
+    private val defaultGameTeamType = gameType
+    private var configuredGameTeamType = gameType
+    private var changesSaved = false
+
     init
     {
         placeholder = true
@@ -90,9 +98,9 @@ class HostSetupMenu : Menu("Game Setup")
                         return@toButton
                     }
 
-                    gameType = GameTeamType
+                    configuredGameTeamType = GameTeamType
                         .values()
-                        .getOrNull(gameType.ordinal + 1)
+                        .getOrNull(configuredGameTeamType.ordinal + 1)
                         ?: GameTeamType.FFA
 
                     player.playSound(
@@ -102,5 +110,45 @@ class HostSetupMenu : Menu("Game Setup")
                     )
                     openMenu(player)
                 }
+
+            this[8] = ItemBuilder
+                .of(if (configuredGameTeamType != defaultGameTeamType) XMaterial.LIGHT_GRAY_WOOL else XMaterial.GREEN_WOOL)
+                .name("${CC.GREEN}Save changes")
+                .addToLore(
+                    "${CC.GRAY}If you're choosing a team",
+                    "${CC.GRAY}game, please make sure",
+                    "${CC.GRAY}to save your setup changes!",
+                    "",
+                    "${CC.I_GRAY}We need to setup additional",
+                    "${CC.I_GRAY}resources for team-based matches.",
+                    "",
+                )
+                .addToLore(
+                    "",
+                    "${CC.GREEN}${
+                        if (configuredGameTeamType != defaultGameTeamType) "${CC.GREEN}Click to save!" else "${CC.RED}Game is still FFA!"
+                    }"
+                )
+                .toButton { _, _ ->
+                    changesSaved = true
+                    player.closeInventory()
+
+                    player.sendMessage("$prefix${CC.GREEN}Re-configuring team resources to fulfil team-based game requirements...")
+                    GameTeamService.configureTeamResources()
+                    player.sendMessage("$prefix${CC.GREEN}Completed re-configuration!")
+                }
         }
+
+    override fun onClose(player: Player, manualClose: Boolean)
+    {
+        val teamChangesMade = configuredGameTeamType != defaultGameTeamType
+
+        if (manualClose && (teamChangesMade && !changesSaved))
+        {
+            delayed(1L) {
+                player.sendMessage("${CC.RED}Please discard (reset back to FFA) or save your changes before exiting the menu!")
+                openMenu(player)
+            }
+        }
+    }
 }
