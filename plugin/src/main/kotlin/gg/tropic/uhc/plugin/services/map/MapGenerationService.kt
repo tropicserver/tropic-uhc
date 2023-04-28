@@ -343,7 +343,7 @@ object MapGenerationService
             }
         }
 
-        if (flag)
+        if (flag && false)
         {
             Bukkit.getServer().unloadWorld(uhcWorld, false)
             File(Bukkit.getWorldContainer().toString() + File.separator + "uhc_world").deleteRecursively()

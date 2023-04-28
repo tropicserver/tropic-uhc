@@ -26,6 +26,7 @@ import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.map.threadlock.ThreadLockUtilities
 import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
 import gg.tropic.uhc.plugin.services.scenario.menu.ScenarioMenu
+import gg.tropic.uhc.plugin.services.scenario.profile
 import gg.tropic.uhc.plugin.services.styles.prefix
 import gg.tropic.uhc.plugin.services.teams.gameType
 import gg.tropic.uhc.shared.UHCGameInfo
@@ -295,8 +296,25 @@ object ScatterService
                 Bukkit.setWhitelist(false)
 
                 teamsScattered
+                    .flatMap {
+                        it.alivePlayers
+                    }
                     .forEach {
-                        it.participants
+                        unsitPlayer(it)
+
+                        it.profile.apply {
+                            limDiamond = 0
+                            limGold = 0
+                            limIron = 0
+
+                            ironMined.reset()
+                            lapisMined.reset()
+                            redstoneMined.reset()
+                            spawnersMined.reset()
+                            coalMined.reset()
+                            diamondsMined.reset()
+                            goldMined.reset()
+                        }
                     }
 
                 Bukkit.broadcastMessage("$prefix${CC.GRAY}This gamemode is currently in BETA!")
@@ -393,8 +411,8 @@ object ScatterService
                     {
                         val firstNotScattered = teamsNotYetScattered.first()
                         ThreadLockUtilities.runMainLock {
-                            firstNotScattered.scatter()
                             scatteredTeams.add(firstNotScattered.id)
+                            firstNotScattered.scatter()
                         }
 
                         sleep(50L)
@@ -409,7 +427,7 @@ object ScatterService
      * scattered. We also add 10 seconds to compensate for any lag/other issues
      * that may occur and delay the scattering process.
      */
-    fun estimatePreStartTime() = (teamsNotYetScattered.size * 5) + (20 * 20)
+    fun estimatePreStartTime() = (teamsNotYetScattered.map { it.participants.size }.count() * 5) + (20 * 20)
 
     fun Player.scatter(
         scatterLocation: Location =

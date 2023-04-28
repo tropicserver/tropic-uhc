@@ -51,15 +51,19 @@ fun Player.joinTeam(teamId: Int)
     }
 
     GameTeamService.teamInvites.invalidate(invite.key)
+    var shouldEliminateAgain = false
 
     this.team?.apply {
         participants.remove(uniqueId)
-        eliminated.remove(uniqueId)
+        shouldEliminateAgain = eliminated.remove(uniqueId)
     }
 
     team.apply {
         participants.add(uniqueId)
-        eliminated.add(uniqueId)
+        if (shouldEliminateAgain)
+        {
+            eliminated.add(uniqueId)
+        }
     }
 
     team.participants
