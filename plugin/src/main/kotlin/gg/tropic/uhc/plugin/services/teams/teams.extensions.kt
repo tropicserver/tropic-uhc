@@ -19,6 +19,7 @@ import java.util.*
  * @author GrowlyX
  * @since 4/25/2023
  */
+const val teamInvitesMetadata = "teaminvites-disabled"
 const val allowGameTypeEditing = true
 var gameType = GameTeamType.FFA
 
@@ -109,7 +110,7 @@ fun CgsGameTeam.sendTeamInviteTo(uniqueId: UUID)
             "This player is no longer online!"
         )
 
-    if (player.hasMetadata("teaminvites-disabled"))
+    if (player.hasMetadata(teamInvitesMetadata))
     {
         throw ConditionFailedException(
             "This player has team invites disabled!"

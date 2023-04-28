@@ -7,6 +7,7 @@ import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.flavor.inject.Inject
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.services.teams.teamInvitesMetadata
 import net.evilblock.cubed.util.CC
 import org.bukkit.metadata.FixedMetadataValue
 
@@ -24,14 +25,14 @@ object TeamInvitesCommand : ScalaCommand()
     @Conditions("team-game-required")
     fun onTeamInvites(player: ScalaPlayer)
     {
-        if (player.bukkit().hasMetadata("teaminvites-disabled"))
+        if (player.bukkit().hasMetadata(teamInvitesMetadata))
         {
-            player.bukkit().removeMetadata("teaminvites-disabled", plugin)
+            player.bukkit().removeMetadata(teamInvitesMetadata, plugin)
             player.bukkit().sendMessage("${CC.GREEN}You are now able to receive team invite requests!")
             return
         }
 
-        player.bukkit().setMetadata("teaminvites-disabled", FixedMetadataValue(plugin, true))
+        player.bukkit().setMetadata(teamInvitesMetadata, FixedMetadataValue(plugin, true))
         player.bukkit().sendMessage("${CC.RED}You are no longer able to receive team invites.")
     }
 }
