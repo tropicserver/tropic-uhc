@@ -3,6 +3,7 @@ package gg.tropic.uhc.plugin.services.teams.channel
 import gg.scala.lemon.channel.ChatChannelComposite
 import gg.scala.lemon.player.rank.Rank
 import gg.scala.lemon.util.QuickAccess.username
+import gg.tropic.uhc.plugin.services.styles.teamPrefix
 import gg.tropic.uhc.plugin.services.teams.team
 import net.evilblock.cubed.util.CC
 import net.kyori.adventure.text.Component
@@ -25,7 +26,7 @@ object TeamChatChannelComposite : ChatChannelComposite
         receiver ?: return Component.text("")
 
         return LegacyComponentSerializer.legacySection()
-            .deserialize("${CC.GOLD}[Team] ${CC.GRAY}[#${receiver.team?.id}] ${rank.color}${
+            .deserialize("$teamPrefix${CC.GRAY}[#${receiver.team?.id}] ${rank.color}${
                 sender.username()
             }${CC.GRAY}: ${CC.RESET}$message")
     }

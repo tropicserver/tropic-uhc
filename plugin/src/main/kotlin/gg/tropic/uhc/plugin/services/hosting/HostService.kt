@@ -64,7 +64,7 @@ object HostService
         delayed(10L) {
             val prevProvider = DefaultChatChannel.chatTagProvider
             DefaultChatChannel.chatTagProvider = ctx@{ player ->
-                var component = prevProvider.invoke(player)
+                var component = Component.text()
 
                 if (gameHost == player.uniqueId)
                     component = component
@@ -90,7 +90,7 @@ object HostService
                             Component.text("]", NamedTextColor.GRAY)
                         )
 
-                component
+                component.append(prevProvider.invoke(player)).build()
             }
         }
     }
