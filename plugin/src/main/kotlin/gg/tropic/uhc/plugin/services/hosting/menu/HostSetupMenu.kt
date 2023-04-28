@@ -54,7 +54,7 @@ class HostSetupMenu : Menu("Game Setup")
                     NumberPrompt()
                         .withText("${CC.GREEN}Enter a player count:")
                         .acceptInput {
-                            if (!gameType.compatibleWith(it.toInt()))
+                            if (!configuredGameTeamType.compatibleWith(it.toInt()))
                             {
                                 player.sendMessage("${CC.RED}${it.toInt()} does not work as a max player count for ${gameType.name}!")
                                 openMenu(player)
