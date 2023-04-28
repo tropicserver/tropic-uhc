@@ -14,6 +14,7 @@ import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
+import gg.tropic.uhc.plugin.services.scatter.alivePlayers
 import gg.tropic.uhc.plugin.services.scatter.remainingPlayers
 import gg.tropic.uhc.plugin.services.scenario.activeNoClean
 import gg.tropic.uhc.plugin.services.teams.gameType
@@ -72,7 +73,11 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
             CgsGameState.STARTING ->
             {
                 lines += "${CC.GOLD}Scattering:"
-                lines += "${CC.WHITE}Scattered: ${CC.GOLD}${ScatterService.teamsScattered.size}/${ScatterService.gameFillCount}"
+                lines += "${CC.WHITE}Scattered: ${CC.GOLD}${
+                    ScatterService.teamsScattered
+                        .map { it.alivePlayers }
+                        .count()
+                }/${ScatterService.gameFillCount}"
                 lines += "${CC.WHITE}Starts in: ${CC.GOLD}${
                     TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
                 }"
