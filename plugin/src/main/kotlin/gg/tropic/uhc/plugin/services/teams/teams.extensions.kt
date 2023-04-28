@@ -124,7 +124,7 @@ fun CgsGameTeam.sendTeamInviteTo(uniqueId: UUID)
         .withMessage(
             "${CC.SEC}You were invited to join team ${CC.GOLD}#$id${CC.YELLOW}! "
         )
-        .withMessage("(Click to join)")
+        .withMessage("${CC.GREEN}(Click to join)")
         .andHoverOf(
             "${CC.GREEN}Abandon your team to join team ${CC.PINK}#$id${CC.GREEN}!"
         )

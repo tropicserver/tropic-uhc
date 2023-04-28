@@ -9,6 +9,7 @@ import net.evilblock.cubed.util.CC
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -23,10 +24,11 @@ object TeamChatChannelComposite : ChatChannelComposite
         message: String, server: String, rank: Rank
     ): TextComponent
     {
-        receiver ?: return Component.text("")
+        val senderPlayer = Bukkit.getPlayer(sender)
+            ?: return Component.text("")
 
         return LegacyComponentSerializer.legacySection()
-            .deserialize("$teamPrefix${CC.GRAY}[#${receiver.team?.id}] ${rank.color}${
+            .deserialize("$teamPrefix${CC.GRAY}[#${senderPlayer.team?.id}] ${rank.color}${
                 sender.username()
             }${CC.GRAY}: ${CC.RESET}$message")
     }

@@ -42,11 +42,11 @@ object GameTeamService
                 .import(TeamChatChannelComposite)
                 .compose()
                 .monitor()
-                .allowOnlyIf {
-                    it.team?.id == id
+                .displayToPlayer { player, player2 ->
+                    player2.team?.id == id && player.team?.id == id
                 }
                 .override(11) {
-                    it.hasMetadata("teamchat")
+                    it.hasMetadata("teamchat") && it.team?.id == id
                 }
 
             ChatChannelService.register(channel)

@@ -394,6 +394,7 @@ object ScatterService
                         val firstNotScattered = teamsNotYetScattered.first()
                         ThreadLockUtilities.runMainLock {
                             firstNotScattered.scatter()
+                            scatteredTeams.add(firstNotScattered.id)
                         }
 
                         sleep(50L)
