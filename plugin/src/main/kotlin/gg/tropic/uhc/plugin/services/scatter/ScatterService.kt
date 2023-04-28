@@ -195,7 +195,7 @@ object ScatterService
                 !gracePeriodActive
             }
             .filter {
-                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTED && it.entity is Player
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTED && it.entity is Player && !it.isCancelled
             }
             .handler {
                 it.isCancelled = true
