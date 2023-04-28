@@ -8,6 +8,8 @@ import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.hosting.menu.HostSetupMenu
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
 import gg.tropic.uhc.plugin.services.styles.prefix
+import gg.tropic.uhc.plugin.services.teams.gameType
+import gg.tropic.uhc.plugin.services.teams.team
 import me.lucko.helper.Events
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -62,8 +64,10 @@ object HostService
         delayed(10L) {
             val prevProvider = DefaultChatChannel.chatTagProvider
             DefaultChatChannel.chatTagProvider = ctx@{ player ->
+                var component = prevProvider.invoke(player)
+
                 if (gameHost == player.uniqueId)
-                    return@ctx prevProvider.invoke(player)
+                    component = component
                         .append(
                             Component.text(" [", NamedTextColor.GRAY)
                         )
@@ -74,7 +78,19 @@ object HostService
                             Component.text("]", NamedTextColor.GRAY)
                         )
 
-                prevProvider.invoke(player)
+                if (gameType.teamSize > 1 && player.team != null)
+                    component = component
+                        .append(
+                            Component.text(" [", NamedTextColor.GRAY)
+                        )
+                        .append(
+                            Component.text("#${player.team!!.id}", NamedTextColor.GREEN)
+                        )
+                        .append(
+                            Component.text("]", NamedTextColor.GRAY)
+                        )
+
+                component
             }
         }
     }

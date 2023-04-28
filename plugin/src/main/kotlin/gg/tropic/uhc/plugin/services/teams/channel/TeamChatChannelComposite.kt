@@ -25,7 +25,7 @@ object TeamChatChannelComposite : ChatChannelComposite
         receiver ?: return Component.text("")
 
         return LegacyComponentSerializer.legacySection()
-            .deserialize("${CC.GOLD}[Team] ${CC.GRAY}[#${receiver.team?.id}] ${CC.WHITE}${
+            .deserialize("${CC.GOLD}[Team] ${CC.GRAY}[#${receiver.team?.id}] ${rank.color}${
                 sender.username()
             }${CC.GRAY}: ${CC.RESET}$message")
     }
