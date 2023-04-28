@@ -132,4 +132,5 @@ fun CgsGameTeam.sendTeamInviteTo(uniqueId: UUID)
             ClickEvent.Action.RUN_COMMAND,
             "/team join $id"
         )
+        .sendToPlayer(player)
 }
