@@ -4,6 +4,7 @@ import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.CommandIssuer
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
+import gg.scala.commons.acf.annotation.Conditions
 import gg.scala.commons.acf.annotation.Default
 import gg.scala.commons.acf.annotation.HelpCommand
 import gg.scala.commons.acf.annotation.PreCommand
@@ -22,17 +23,9 @@ object TeamCommands : ScalaCommand()
 {
     @Default
     @HelpCommand
+    @Conditions("team-game-required")
     fun onHelp(help: CommandHelp)
     {
         help.showHelp()
-    }
-
-    @PreCommand
-    fun onPreCommand(issuer: CommandIssuer)
-    {
-        if (gameType.teamSize < 2)
-        {
-            throw ConditionFailedException("You cannot use this command in FFA games!")
-        }
     }
 }

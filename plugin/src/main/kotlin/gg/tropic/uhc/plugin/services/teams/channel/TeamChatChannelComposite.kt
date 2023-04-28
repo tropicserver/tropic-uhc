@@ -27,7 +27,7 @@ object TeamChatChannelComposite : ChatChannelComposite
         return LegacyComponentSerializer.legacySection()
             .deserialize("${CC.GOLD}[Team] ${CC.GRAY}[#${receiver.team?.id}] ${CC.WHITE}${
                 sender.username()
-            }: $message")
+            }${CC.GRAY}: ${CC.RESET}$message")
     }
 
     override fun identifier() = "teamchat"

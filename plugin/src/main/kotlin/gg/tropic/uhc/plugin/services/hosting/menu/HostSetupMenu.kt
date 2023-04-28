@@ -84,7 +84,7 @@ class HostSetupMenu : Menu("Game Setup")
                 )
                 .apply {
                     GameTeamType.values().forEach {
-                        addToLore("${if (gameType == it) "${CC.GREEN}► " else CC.GRAY}${it.name}")
+                        addToLore("${if (configuredGameTeamType == it) "${CC.GREEN}► " else CC.GRAY}${it.name}")
                     }
                 }
                 .addToLore(
@@ -112,24 +112,28 @@ class HostSetupMenu : Menu("Game Setup")
                 }
 
             this[8] = ItemBuilder
-                .of(if (configuredGameTeamType != defaultGameTeamType) XMaterial.LIGHT_GRAY_WOOL else XMaterial.GREEN_WOOL)
+                .of(if (configuredGameTeamType == defaultGameTeamType) XMaterial.LIGHT_GRAY_WOOL else XMaterial.GREEN_WOOL)
                 .name("${CC.GREEN}Save changes")
                 .addToLore(
                     "${CC.GRAY}If you're choosing a team",
                     "${CC.GRAY}game, please make sure",
                     "${CC.GRAY}to save your setup changes!",
                     "",
-                    "${CC.I_GRAY}We need to setup additional",
-                    "${CC.I_GRAY}resources for team-based matches.",
-                    "",
-                )
-                .addToLore(
+                    "${CC.WHITE}We need to setup additional",
+                    "${CC.WHITE}resources for team-based matches.",
                     "",
                     "${CC.GREEN}${
                         if (configuredGameTeamType != defaultGameTeamType) "${CC.GREEN}Click to save!" else "${CC.RED}Game is still FFA!"
                     }"
                 )
                 .toButton { _, _ ->
+                    if (configuredGameTeamType == defaultGameTeamType)
+                    {
+                        player.sendMessage("${CC.RED}No changes require saving!")
+                        return@toButton
+                    }
+
+                    gameType = configuredGameTeamType
                     changesSaved = true
                     player.closeInventory()
 

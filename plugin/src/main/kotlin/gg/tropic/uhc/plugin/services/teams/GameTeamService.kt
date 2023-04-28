@@ -1,10 +1,8 @@
 package gg.tropic.uhc.plugin.services.teams
 
-import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.flavor.inject.Inject
-import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.scala.lemon.channel.ChatChannelBuilder
 import gg.scala.lemon.channel.ChatChannelService

@@ -1,8 +1,7 @@
 package gg.tropic.uhc.plugin.services.teams.commands
 
-import gg.scala.commons.acf.CommandIssuer
 import gg.scala.commons.acf.annotation.CommandAlias
-import gg.scala.commons.acf.annotation.PreCommand
+import gg.scala.commons.acf.annotation.Conditions
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
@@ -21,11 +20,8 @@ object TeamChatCommand : ScalaCommand()
     @Inject
     lateinit var plugin: TropicUHCPlugin
 
-    @PreCommand
-    fun onPreCommand(issuer: CommandIssuer) =
-        TeamCommands.onPreCommand(issuer)
-
     @CommandAlias("teamchat|tc")
+    @Conditions("team-game-required")
     fun onTeamChat(player: ScalaPlayer)
     {
         if (player.bukkit().hasMetadata("teamchat"))
