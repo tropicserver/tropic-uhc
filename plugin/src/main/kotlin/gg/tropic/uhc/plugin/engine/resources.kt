@@ -6,6 +6,7 @@ import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.runnable.state.EndedStateRunnable
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
+import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.util.QuickAccess.username
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
@@ -97,6 +98,16 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                         )
                         .gameKills.value
                 }"
+
+                if (gameType.teamSize > 1)
+                {
+                    CgsGameTeamService
+                        .getTeamOf(player)
+                        ?.apply {
+                            lines += "Team kills: ${CC.PRI}$totalKills"
+                        }
+                }
+
                 lines += "Border: ${CC.PRI}${
                     Numbers.format(WorldBorderService.currentSize.toInt())
                 }${
