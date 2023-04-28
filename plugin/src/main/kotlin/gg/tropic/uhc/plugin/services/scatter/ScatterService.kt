@@ -34,6 +34,7 @@ import me.lucko.helper.Events
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
+import net.evilblock.cubed.visibility.VisibilityHandler
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -452,5 +453,7 @@ object ScatterService
             "scattered",
             FixedMetadataValue(plugin, true)
         )
+
+        VisibilityHandler.update(player)
     }
 }

@@ -5,8 +5,11 @@ import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.lemon.util.QuickAccess.username
 import gg.tropic.uhc.plugin.services.styles.teamPrefix
+import net.evilblock.cubed.nametag.NametagHandler
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.FancyMessage
+import net.evilblock.cubed.visibility.VisibilityAction
+import net.evilblock.cubed.visibility.VisibilityHandler
 import net.md_5.bungee.api.chat.ClickEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -65,6 +68,9 @@ fun Player.joinTeam(teamId: Int)
             eliminated.add(uniqueId)
         }
     }
+
+    VisibilityHandler.update(player)
+    NametagHandler.reloadPlayer(player)
 
     team.participants
         .mapNotNull {
