@@ -4,6 +4,7 @@ import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.core.plugin.Plugin
 import gg.scala.commons.core.plugin.PluginAuthor
+import gg.scala.commons.core.plugin.PluginWebsite
 import gg.scala.commons.core.plugin.PluginDependency
 import gg.scala.commons.core.plugin.PluginDependencyComposite
 import gg.tropic.uhc.plugin.engine.UHCGameEngine
@@ -14,10 +15,10 @@ import gg.tropic.uhc.plugin.engine.UHCGameEngine
  */
 @Plugin(
     name = "UHC",
-    version = "%remote%/%branch%/%id%",
-    description = "The plugin for Tropic's UHC gamemode."
+    version = "%remote%/%branch%/%id%"
 )
-@PluginAuthor("GrowlyX")
+@PluginAuthor("Scala")
+@PluginWebsite("https://scala.gg")
 @PluginDependencyComposite(
     PluginDependency("scala-commons"),
     PluginDependency("ScGameFramework"),
