@@ -28,6 +28,8 @@ class TropicUHCLobbyPlugin : ExtendedScalaPlugin()
     @ContainerEnable
     fun containerEnable()
     {
-        CgsGameLobby.INSTANCE = UHCGameLobby()
+        val lobby = UHCGameLobby()
+        lobby.resourcePlugin = this
+        CgsGameLobby.INSTANCE = lobby
     }
 }
