@@ -1,5 +1,6 @@
 package gg.tropic.uhc.plugin.lobby.engine
 
+import gg.glade.core.game.coins.CoinProfileManager
 import gg.scala.cgs.common.instance.CgsServerInstance
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.lobby.command.commands.RecentGamesCommand
@@ -13,6 +14,7 @@ import gg.tropic.uhc.shared.player.UHCPlayerModel
 import net.evilblock.cubed.scoreboard.ScoreboardAdapter
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import java.util.*
@@ -76,11 +78,11 @@ class UHCGameLobby : CgsGameLobby<UHCPlayerModel>(UHCPlayerModel::class)
 
         override fun getLines(lines: LinkedList<String>, player: Player)
         {
-            lines += ""
-            lines += "${CC.WHITE}Lobby: ${CC.GOLD}${
+            lines += "${CC.GRAY}${CC.STRIKE_THROUGH}----------------"
+            lines += "${CC.WHITE}Lobby: ${CC.AQUA}${
                 CgsGameInfoUpdater.lobbyTotalCount
             }"
-            lines += "${CC.WHITE}In-Game: ${CC.GOLD}${
+            lines += "${CC.WHITE}In-Game: ${CC.AQUA}${
                 CgsGameInfoUpdater.playingTotalCount
             }"
 
@@ -89,16 +91,22 @@ class UHCGameLobby : CgsGameLobby<UHCPlayerModel>(UHCPlayerModel::class)
             )
 
             lines += ""
-            lines += "${CC.GOLD}UHC:"
-            lines += " Kills: ${CC.GOLD}${stats.kills.value}"
-            lines += " Wins: ${CC.GOLD}${stats.wins.value}"
-            lines += " Losses: ${CC.GOLD}${stats.losses.value}"
-            lines += " Deaths: ${CC.GOLD}${stats.deaths.value}"
+            lines += "Coins: ${CC.GOLD}${
+                Numbers.format(
+                    CoinProfileManager.find(player)?.coins ?: 0
+                )
+            }"
             lines += ""
-            lines += "${CC.GRAY}${LemonConstants.WEB_LINK} $footerPadding"
+            lines += "${CC.AQUA}Your stats:"
+            lines += "Kills: ${CC.AQUA}${stats.kills.value}"
+            lines += "Wins: ${CC.AQUA}${stats.wins.value}"
+            lines += "Losses: ${CC.AQUA}${stats.losses.value}"
+            lines += ""
+            lines += "${CC.AQUA}${LemonConstants.WEB_LINK}"
+            lines += "${CC.GRAY}${CC.STRIKE_THROUGH}----------------"
         }
 
-        override fun getTitle(player: Player) = "${CC.B_PINK}The Arcade"
+        override fun getTitle(player: Player) = "${CC.B_AQUA}Glade ${CC.B_WHITE}Network"
     }
 
     override fun getScoreboardAdapter() = scoreboardAdapter
