@@ -3,6 +3,7 @@ package gg.tropic.uhc.plugin.services.teams.commands.customizer
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.annotations.commands.customizer.CommandManagerCustomizer
 import gg.scala.commons.command.ScalaCommandManager
+import gg.tropic.uhc.plugin.autonomous
 import gg.tropic.uhc.plugin.services.teams.gameType
 
 /**
@@ -19,6 +20,14 @@ object TeamCommandCustomizer
                 if (gameType.teamSize <= 1)
                     throw ConditionFailedException(
                         "You cannot use this command in an FFA game!"
+                    )
+            }
+
+        manager.commandConditions
+            .addCondition("hosted-game-required") {
+                if (autonomous)
+                    throw ConditionFailedException(
+                        "You cannot use this command in an autonomous game game!"
                     )
             }
     }

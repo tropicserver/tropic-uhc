@@ -2,6 +2,7 @@ package gg.tropic.uhc.plugin.services.map.commands
 
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
+import gg.scala.commons.acf.annotation.Conditions
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
@@ -18,6 +19,7 @@ object ChunkGenUnlockCommand : ScalaCommand()
 {
     @CommandAlias("reset-overworld")
     @CommandPermission("uhc.command.reset-overworld")
+    @Conditions("hosted-game-required")
     fun onUnlock(player: ScalaPlayer)
     {
         File(Bukkit.getWorldContainer(), "tropic.uhc.lock").delete()
@@ -26,6 +28,7 @@ object ChunkGenUnlockCommand : ScalaCommand()
 
     @CommandAlias("lock-gen-border")
     @CommandPermission("op")
+    @Conditions("hosted-game-required")
     fun onLockGenBorder(player: ScalaPlayer)
     {
         File(Bukkit.getWorldContainer(), "tropic.uhc.lock")

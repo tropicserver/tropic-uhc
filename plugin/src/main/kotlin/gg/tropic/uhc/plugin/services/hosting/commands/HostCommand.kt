@@ -3,6 +3,7 @@ package gg.tropic.uhc.plugin.services.hosting.commands
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
+import gg.scala.commons.acf.annotation.Conditions
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
@@ -22,6 +23,7 @@ import org.bukkit.Bukkit
 object HostCommand : ScalaCommand()
 {
     @CommandAlias("host-unbind")
+    @Conditions("hosted-game-required")
     @CommandPermission("uhc.command.host.unbind")
     fun onHostUnbind(player: ScalaPlayer)
     {
@@ -39,6 +41,7 @@ object HostCommand : ScalaCommand()
     }
 
     @CommandAlias("host")
+    @Conditions("hosted-game-required")
     @CommandPermission("uhc.command.host")
     fun onHost(player: ScalaPlayer)
     {

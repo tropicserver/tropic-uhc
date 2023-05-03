@@ -16,7 +16,7 @@ object UHCGameInfo : CgsGameGeneralInfo(
     awards = CgsGameAwardInfo(
         awardCoins = true,
         winningCoinRange = 1000..2000,
-        participationCoinRange = 25..100
+        participationCoinRange = 250..300
     ),
     preStartVoting = false,
     disqualifyOnLogout = false,

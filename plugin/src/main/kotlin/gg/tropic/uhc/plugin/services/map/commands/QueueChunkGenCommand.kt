@@ -5,6 +5,7 @@ import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
+import gg.scala.commons.acf.annotation.Conditions
 import gg.scala.commons.acf.annotation.Optional
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
@@ -26,6 +27,7 @@ object QueueChunkGenCommand : ScalaCommand()
 {
     @CommandAlias("generate-nether")
     @CommandPermission("uhc.command.regen")
+    @Conditions("hosted-game-required")
     fun onGenerateNether(player: ScalaPlayer)
     {
         if (MapGenerationService.generating)
@@ -51,6 +53,7 @@ object QueueChunkGenCommand : ScalaCommand()
 
     @CommandAlias("generate-overworld")
     @CommandPermission("uhc.command.regen")
+    @Conditions("hosted-game-required")
     fun onQueueChunkLoad(
         player: ScalaPlayer, @Optional chunksPerRun: Int?
     )

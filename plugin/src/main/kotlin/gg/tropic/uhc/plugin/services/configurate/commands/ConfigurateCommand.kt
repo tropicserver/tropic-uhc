@@ -1,6 +1,7 @@
 package gg.tropic.uhc.plugin.services.configurate.commands
 
 import gg.scala.commons.acf.annotation.CommandAlias
+import gg.scala.commons.acf.annotation.Conditions
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
@@ -16,12 +17,14 @@ import net.evilblock.cubed.util.CC
 object ConfigurateCommand : ScalaCommand()
 {
     @CommandAlias("config|cfg")
+    @Conditions("hosted-game-required")
     fun onConfig(player: ScalaPlayer)
     {
         ConfigurateMenu().openMenu(player.bukkit())
     }
 
     @CommandAlias("printconfig")
+    @Conditions("hosted-game-required")
     fun onPrintConfig(player: ScalaPlayer)
     {
         player.sendMessage("${CC.GREEN}Game Config:")
