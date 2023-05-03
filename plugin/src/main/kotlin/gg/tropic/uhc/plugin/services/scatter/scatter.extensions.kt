@@ -3,6 +3,7 @@ package gg.tropic.uhc.plugin.services.scatter
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
+import gg.tropic.uhc.plugin.services.scatter.ScatterService.postScatterLogic
 import gg.tropic.uhc.plugin.services.scatter.ScatterService.scatter
 import me.lucko.helper.utils.Players
 import net.minecraft.server.v1_8_R3.EntityBat
@@ -40,6 +41,7 @@ fun CgsGameTeam.scatter()
 
     alivePlayers.forEach {
         it.scatter(scatterLocation = scatterLocation)
+        postScatterLogic.invoke(it)
     }
 }
 

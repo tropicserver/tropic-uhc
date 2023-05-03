@@ -85,9 +85,9 @@ public class MapChunkLoadTask implements Runnable {
             .getBlockZ());
 
         int chunkWidthX = (int) Math.ceil((double) (((world.getWorldBorder()
-            .getSize() / 2) + 16) * 2) / 16);
+            .getSize()) + 16) * 2) / 16);
         int chunkWidthZ = (int) Math.ceil((double) (((world.getWorldBorder()
-            .getSize() / 2) + 16) * 2) / 16);
+            .getSize()) + 16) * 2) / 16);
         int biggerWidth = (chunkWidthX > chunkWidthZ) ? chunkWidthX
             : chunkWidthZ; // We need to calculate the reportTarget with the
         // bigger width, since the spiral will only stop

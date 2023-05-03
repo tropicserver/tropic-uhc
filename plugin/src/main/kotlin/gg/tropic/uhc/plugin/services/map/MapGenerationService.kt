@@ -96,8 +96,8 @@ object MapGenerationService
 
             cuboid = Cuboid(
                 mapWorld(),
-                -(WorldBorderService.initialSize.toInt() / 2), 100, -(WorldBorderService.initialSize.toInt() / 2),
-                WorldBorderService.initialSize.toInt() / 2, 100, WorldBorderService.initialSize.toInt() / 2
+                -(WorldBorderService.initialSize.toInt()), 100, -WorldBorderService.initialSize.toInt(),
+                WorldBorderService.initialSize.toInt(), 100, WorldBorderService.initialSize.toInt()
             )
 
             uhcWorld.setSpawnLocation(
@@ -243,7 +243,7 @@ object MapGenerationService
 
     fun generateScatterLocation(): Location
     {
-        val halfRange = WorldBorderService.initialSize.toInt() / 2
+        val halfRange = WorldBorderService.initialSize.toInt()
         val randomX = (-halfRange..halfRange).random()
         val randomZ = (-halfRange..halfRange).random()
 
@@ -274,8 +274,8 @@ object MapGenerationService
 
         cuboid = Cuboid(
             mapWorld(),
-            -(WorldBorderService.initialSize.toInt() / 2), 100, -(WorldBorderService.initialSize.toInt() / 2),
-            WorldBorderService.initialSize.toInt() / 2, 100, WorldBorderService.initialSize.toInt() / 2
+            -WorldBorderService.initialSize.toInt(), 100, -WorldBorderService.initialSize.toInt(),
+            WorldBorderService.initialSize.toInt(), 100, WorldBorderService.initialSize.toInt()
         )
 
         uhcWorld.setSpawnLocation(

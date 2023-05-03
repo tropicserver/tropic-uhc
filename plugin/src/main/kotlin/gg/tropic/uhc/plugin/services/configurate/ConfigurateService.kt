@@ -8,6 +8,7 @@ import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.map.mapWorld
+import gg.tropic.uhc.plugin.services.scenario.GoldenHead
 import gg.tropic.uhc.plugin.services.scenario.playing
 import gg.tropic.uhc.plugin.services.scenario.profile
 import me.lucko.helper.Events
@@ -15,25 +16,19 @@ import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.FancyMessage
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.md_5.bungee.api.chat.ClickEvent
-import org.bukkit.Bukkit
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.entity.Entity
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.inventory.CraftItemEvent
-import org.bukkit.event.player.PlayerBucketEmptyEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerPortalEvent
-import org.bukkit.event.player.PlayerTeleportEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitRunnable
+import java.util.*
 
 
 /**
@@ -45,6 +40,8 @@ object ConfigurateService
 {
     @Inject
     lateinit var plugin: TropicUHCPlugin
+
+    var customGoldenHeadLogic = { player: Player -> }
 
     @Configure
     fun configure()
@@ -222,24 +219,67 @@ object ConfigurateService
             }
             .bindWith(plugin)
 
+        val headCooldown = mutableMapOf<UUID, Boolean>()
+
         Events
-            .subscribe(PlayerItemConsumeEvent::class.java)
-            .handler {
-                if (it.isCancelled)
+            .subscribe(PlayerInteractEvent::class.java)
+            .handler { event ->
+                if (event.action != Action.RIGHT_CLICK_AIR && event.action != Action.RIGHT_CLICK_BLOCK) return@handler
+
+                val player = event.player
+                val hand = player.itemInHand
+
+                if (headCooldown.getOrDefault(player.uniqueId, false))
                 {
+                    player.sendMessage(ChatColor.RED.toString() + "Wait 2 seconds before eating a head again.")
                     return@handler
                 }
 
-                if (it.item == null || it.item.type !== Material.GOLDEN_APPLE || it.item
-                        .itemMeta == null || !it.item.itemMeta.hasDisplayName()
-                    || !it.item.itemMeta.displayName.equals(CC.GOLD + "Golden Head", true)
-                )
+                // Ignore items that are golden heads or non-heads
+                // Note: Golden Heads are handled in GoldenHeadCraft.java
+                if (GoldenHead.isGoldenHead(hand)) return@handler
+                if (!GoldenHead.isHead(hand)) return@handler
+
+                event.isCancelled = true
+
+                // Decrement amount of heads they're holding
+                if (hand.amount <= 1)
                 {
-                    return@handler
+                    player.itemInHand = ItemStack(Material.AIR)
+                } else
+                {
+                    hand.amount = hand.amount - 1
                 }
 
-                it.player.removePotionEffect(PotionEffectType.REGENERATION)
-                it.player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 200, 1))
+                //Eat Sound
+                player.playSound(player.location, Sound.EAT, 10f, 1f)
+
+                // Add 1 heart to the player
+                player.health = player.maxHealth.coerceAtMost(player.health + 1)
+
+                fun overridePotionEffect(player: Player, effect: PotionEffect)
+                {
+                    if (player.hasPotionEffect(effect.type))
+                    {
+                        player.removePotionEffect(effect.type)
+                    }
+
+                    player.addPotionEffect(effect)
+                }
+
+                // Give regen effect
+                overridePotionEffect(player, PotionEffect(PotionEffectType.REGENERATION, 4 * 20, 2))
+                customGoldenHeadLogic.invoke(player)
+
+                headCooldown.put(player.uniqueId, false)
+
+                object : BukkitRunnable()
+                {
+                    override fun run()
+                    {
+                        headCooldown.put(player.uniqueId, false)
+                    }
+                }.runTaskLater(plugin, (2 * 20).toLong())
             }
             .bindWith(plugin)
 

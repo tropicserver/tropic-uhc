@@ -12,6 +12,7 @@ import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.scala.lemon.LemonConstants
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.autonomous
 import gg.tropic.uhc.plugin.engine.createRunner
 import gg.tropic.uhc.plugin.services.border.BorderUpdateEventExecutor
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
@@ -84,6 +85,9 @@ object ScatterService
     var gameFillCount = 0
     var gracePeriodActive = true
 
+    var lobbyItemApplication = { player: Player -> }
+    var postScatterLogic = { player: Player -> }
+
     @Configure
     fun configure()
     {
@@ -104,19 +108,22 @@ object ScatterService
         fun Player.applyLobbyItems()
         {
             delayed(4L) {
-                inventory.setItem(
-                    0, ItemBuilder
-                        .of(Material.BOOK)
-                        .name("${CC.GOLD}Game Config ${CC.GRAY}(Right Click)")
-                        .build()
-                )
+                if (!autonomous)
+                {
+                    inventory.setItem(
+                        0, ItemBuilder
+                            .of(Material.BOOK)
+                            .name("${CC.GOLD}Game Config ${CC.GRAY}(Right Click)")
+                            .build()
+                    )
 
-                inventory.setItem(
-                    1, ItemBuilder
-                        .of(Material.JUKEBOX)
-                        .name("${CC.D_AQUA}Scenarios ${CC.GRAY}(Right Click)")
-                        .build()
-                )
+                    inventory.setItem(
+                        1, ItemBuilder
+                            .of(Material.JUKEBOX)
+                            .name("${CC.D_AQUA}Scenarios ${CC.GRAY}(Right Click)")
+                            .build()
+                    )
+                }
 
                 inventory.setItem(
                     8, ItemBuilder
@@ -130,6 +137,8 @@ object ScatterService
                         .name("${CC.GREEN}Spectate ${CC.GRAY}(Right Click)")
                         .build()
                 )
+
+                lobbyItemApplication(this)
                 updateInventory()
             }
         }
@@ -323,7 +332,9 @@ object ScatterService
 
                 Bukkit.broadcastMessage("$prefix${CC.GRAY}This gamemode is currently in BETA!")
                 Bukkit.broadcastMessage("$prefix${CC.GRAY}Please report any bugs/issues in our Discord server!")
-                Bukkit.broadcastMessage("$prefix${CC.GOLD}Our rules are posted at ${CC.BOLD}tropic.gg/uhc/rules${CC.GOLD}, please acknowledge them.")
+                Bukkit.broadcastMessage("$prefix${CC.GOLD}Our rules are posted at ${CC.BOLD}${
+                    LemonConstants.WEB_LINK
+                }/uhc/rules${CC.GOLD}, please acknowledge them.")
 
                 WorldBorderService.currentSize = initialBorderSize
                     .value.toDouble()

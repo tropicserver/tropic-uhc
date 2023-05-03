@@ -71,8 +71,7 @@ object WorldBorderService
 
     fun Player.ensureWithinBorderBounds(border: Int)
     {
-        val maximum = border / 2
-        val minimum = -(maximum)
+        val minimum = -(border)
 
         val location = location.clone()
         var locationModified = false
@@ -83,9 +82,9 @@ object WorldBorderService
             locationModified = true
         }
 
-        if (location.x > maximum)
+        if (location.x > border)
         {
-            location.x = maximum - BOUND_OFFSET
+            location.x = border - BOUND_OFFSET
             locationModified = true
         }
 
@@ -95,9 +94,9 @@ object WorldBorderService
             locationModified = true
         }
 
-        if (location.z > maximum)
+        if (location.z > border)
         {
-            location.z = maximum - BOUND_OFFSET
+            location.z = border - BOUND_OFFSET
             locationModified = true
         }
 

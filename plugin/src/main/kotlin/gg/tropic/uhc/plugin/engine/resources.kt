@@ -73,15 +73,15 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
 
             CgsGameState.STARTING ->
             {
-                lines += "${CC.GOLD}Scattering:"
-                lines += "${CC.WHITE}Scattered: ${CC.GOLD}${
+                lines += "${CC.PRI}Scattering:"
+                lines += "${CC.WHITE}Scattered: ${CC.PRI}${
                     Players.all()
                         .filter { 
                             it.hasMetadata("scattered")
                         }
                         .size
                 }/${ScatterService.gameFillCount}"
-                lines += "${CC.WHITE}Starts in: ${CC.GOLD}${
+                lines += "${CC.WHITE}Starts in: ${CC.PRI}${
                     TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
                 }"
                 lines += ""
@@ -126,8 +126,8 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                 player.activeNoClean
                     ?.apply {
                         lines += ""
-                        lines += "${CC.GOLD}Cooldowns:"
-                        lines += "${CC.WHITE}No Clean: ${CC.GOLD}${
+                        lines += "${CC.PRI}Cooldowns:"
+                        lines += "${CC.WHITE}No Clean: ${CC.PRI}${
                             (first - System.currentTimeMillis()) / 1000
                         }s"
                     }
@@ -143,8 +143,8 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                 lines += "${CC.GREEN}for winning the game!"
                 lines += ""
                 lines += "${CC.WHITE}Host: ${CC.RED}${hostDisplayName()}"
-                lines += "${CC.WHITE}Participants: ${CC.GOLD}${ScatterService.gameFillCount}"
-                lines += "${CC.WHITE}Ends in: ${CC.GOLD}${
+                lines += "${CC.WHITE}Participants: ${CC.PRI}${ScatterService.gameFillCount}"
+                lines += "${CC.WHITE}Ends in: ${CC.PRI}${
                     60 - EndedStateRunnable.currentTick
                 }s"
             }
