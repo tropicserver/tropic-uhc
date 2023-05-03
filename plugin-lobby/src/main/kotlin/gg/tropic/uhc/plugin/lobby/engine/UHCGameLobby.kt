@@ -9,6 +9,7 @@ import gg.scala.cgs.lobby.leaderboard.CgsLobbyRankingEntry
 import gg.scala.cgs.lobby.updater.CgsGameInfoUpdater
 import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.redirection.impl.VelocityRedirectSystem
+import gg.scala.tangerine.tracking.TangerinePlayerTracker
 import gg.tropic.uhc.shared.UHCGameInfo
 import gg.tropic.uhc.shared.player.UHCPlayerModel
 import net.evilblock.cubed.scoreboard.ScoreboardAdapter
@@ -74,36 +75,22 @@ class UHCGameLobby : CgsGameLobby<UHCPlayerModel>(UHCPlayerModel::class)
 
     private val scoreboardAdapter = object : ScoreboardAdapter()
     {
-        private val footerPadding = "${CC.GRAY} ".repeat(10)
-
         override fun getLines(lines: LinkedList<String>, player: Player)
         {
             lines += "${CC.GRAY}${CC.STRIKE_THROUGH}----------------"
-            lines += "${CC.WHITE}Lobby: ${CC.AQUA}${
-                CgsGameInfoUpdater.lobbyTotalCount
+            lines += "${CC.AQUA}Players:"
+            lines += "${CC.WHITE}${
+                Numbers.format(TangerinePlayerTracker.globalPlayers)
             }"
-            lines += "${CC.WHITE}In-Game: ${CC.AQUA}${
-                CgsGameInfoUpdater.playingTotalCount
-            }"
-
-            val stats = getStatistics(
-                CgsPlayerHandler.find(player)!!
-            )
-
             lines += ""
-            lines += "Coins: ${CC.GOLD}${
+            lines += "${CC.AQUA}Coins:"
+            lines += "${CC.GOLD}${
                 Numbers.format(
                     CoinProfileManager.find(player)?.coins ?: 0
                 )
             }"
-            lines += ""
-            lines += "${CC.AQUA}Your stats:"
-            lines += "Kills: ${CC.AQUA}${stats.kills.value}"
-            lines += "Wins: ${CC.AQUA}${stats.wins.value}"
-            lines += "Losses: ${CC.AQUA}${stats.losses.value}"
-            lines += ""
-            lines += "${CC.AQUA}${LemonConstants.WEB_LINK}"
             lines += "${CC.GRAY}${CC.STRIKE_THROUGH}----------------"
+            lines += "${CC.AQUA}Glade.GG"
         }
 
         override fun getTitle(player: Player) = "${CC.B_AQUA}Glade ${CC.B_WHITE}Network"
