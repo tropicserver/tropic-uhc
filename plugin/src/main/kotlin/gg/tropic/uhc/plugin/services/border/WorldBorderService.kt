@@ -63,7 +63,7 @@ object WorldBorderService
             .forEach {
                 val worldBorder = it.worldBorder
                 worldBorder.setCenter(center!!.first, center!!.second)
-                worldBorder.size = size
+                worldBorder.size = size * 2
             }
     }
 

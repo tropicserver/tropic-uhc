@@ -8,6 +8,11 @@ import xyz.mkotb.configapi.comment.Comment
  */
 class TropicUHCConfig
 {
-    @Comment("Is this an automated UHC server?")
+    @Comment("The following settings are related to the autonomous plugin mode.")
     var autonomous = false
+    var autonomousPreGenWorldFolder = "/opt/glade/worlds/"
+    var autonomousWorldBorderSize = 1500
+
+    var autonomousGameType = "FFA"
+    var autonomousMaxPlayers = 80
 }

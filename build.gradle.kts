@@ -10,7 +10,7 @@ plugins {
 
 allprojects {
     group = "gg.tropic.uhc"
-    version = "1.0.2"
+    version = "1.0.5"
 
     repositories {
         mavenCentral()

@@ -8,3 +8,7 @@ val autonomous: Boolean
     get() = TropicUHCPlugin.instance
         .config<TropicUHCConfig>()
         .autonomous
+
+val config: TropicUHCConfig
+    get() = TropicUHCPlugin.instance
+        .config<TropicUHCConfig>()

@@ -7,25 +7,24 @@ import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.autonomous
+import gg.tropic.uhc.plugin.config
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.configurate.initialBorderSize
-import gg.tropic.uhc.plugin.services.hosting.isHost
 import gg.tropic.uhc.plugin.services.map.biome.BiomeSwapper
 import gg.tropic.uhc.plugin.services.map.threshold.BiomeThreshold
 import gg.tropic.uhc.plugin.services.scenario.playing
 import gg.tropic.uhc.plugin.services.styles.prefix
+import gg.tropic.uhc.plugin.services.teams.GameTeamService
+import gg.tropic.uhc.plugin.services.teams.GameTeamType
+import gg.tropic.uhc.plugin.services.teams.gameType
+import gg.tropic.uhc.shared.UHCGameInfo
 import me.lucko.helper.Events
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import org.bukkit.Bukkit
-import org.bukkit.Difficulty
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.World
-import org.bukkit.WorldCreator
-import org.bukkit.WorldType
+import org.bukkit.*
 import org.bukkit.block.Biome
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerTeleportEvent
@@ -48,6 +47,9 @@ object MapGenerationService
     var generating = false
     var generation: MapChunkLoadTask? = null
 
+    private val validWorlds = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    private val validNethers = intArrayOf(1, 2, 3, 4, 5, 6, 7)
+
     @Configure
     fun configure()
     {
@@ -62,9 +64,29 @@ object MapGenerationService
             }
             .bindWith(plugin)
 
+        UHCGameInfo.awards.awardCoins = autonomous
+
+        if (autonomous)
+        {
+            plugin.logger.info("Configuring game info to be autonomous")
+            // TODO: configure default scenarios and configuration
+
+            Bukkit.dispatchCommand(
+                Bukkit.getConsoleSender(),
+                "setmaxplayers ${config.autonomousMaxPlayers}"
+            )
+
+            if (config.autonomousGameType != "FFA")
+            {
+                plugin.logger.info("Configured team based autonomous game")
+                gameType = GameTeamType.valueOf(config.autonomousGameType)
+                GameTeamService.configureTeamResources()
+            }
+        }
+
         val lockFile = File(Bukkit.getWorldContainer(), "tropic.uhc.lock")
 
-        if (!lockFile.exists())
+        if (!lockFile.exists() && !autonomous)
         {
             deleteExistingWorld()
             createNewWorld()
@@ -73,12 +95,41 @@ object MapGenerationService
         } else
         {
             BiomeSwapper.swapBiomes()
-            val text = lockFile.readText()
 
-            if (text != "")
+            if (lockFile.exists())
             {
-                initialBorderSize.valueInternal = text.toInt()
-                plugin.logger.info("Loaded cached border size of $text")
+                val text = lockFile.readText()
+
+                if (text != "")
+                {
+                    initialBorderSize.valueInternal = text.toInt()
+                    plugin.logger.info("Loaded CACHED border size of $text")
+                }
+            }
+
+            if (autonomous)
+            {
+                initialBorderSize.valueInternal = config.autonomousWorldBorderSize
+                plugin.logger.info("Loaded AUTONOMOUS border size of ${config.autonomousWorldBorderSize}")
+
+                val randomWorldSelection = validWorlds.random()
+                plugin.logger.info("Selected pre-gen $randomWorldSelection to use")
+
+                val preGenWorld = File(
+                    "${config.autonomousPreGenWorldFolder}/UHCWorld$randomWorldSelection"
+                )
+
+                val uhcWorldFile = File(
+                    Bukkit.getWorldContainer(),
+                    "uhc_world"
+                )
+
+                if (uhcWorldFile.exists())
+                {
+                    uhcWorldFile.deleteRecursively()
+                }
+
+                preGenWorld.copyRecursively(uhcWorldFile)
             }
 
             val uhcWorld = Bukkit.createWorld(
@@ -117,6 +168,56 @@ object MapGenerationService
             plugin.logger.info("Loaded world from lock file.")
         }
 
+        if (autonomous)
+        {
+            val randomWorldSelection = validNethers.random()
+            plugin.logger.info("Selected pre-gen nether world $randomWorldSelection to use")
+
+            val preGenWorld = File(
+                "${config.autonomousPreGenWorldFolder}/world_nether$randomWorldSelection"
+            )
+
+            val uhcWorldFile = File(
+                Bukkit.getWorldContainer(),
+                "uhc_nether"
+            )
+
+            if (uhcWorldFile.exists())
+            {
+                uhcWorldFile.deleteRecursively()
+            }
+
+            preGenWorld.copyRecursively(uhcWorldFile)
+        }
+
+        if (autonomous)
+        {
+            val preGenWorld = File(
+                "${config.autonomousPreGenWorldFolder}/Deathmatch"
+            )
+
+            val uhcWorldFile = File(
+                Bukkit.getWorldContainer(),
+                "Deathmatch"
+            )
+
+            if (uhcWorldFile.exists())
+            {
+                uhcWorldFile.deleteRecursively()
+            }
+
+            preGenWorld.copyRecursively(uhcWorldFile)
+
+            val uhcNether = Bukkit.createWorld(
+                WorldCreator("Deathmatch")
+                    .environment(World.Environment.NORMAL)
+                    .type(WorldType.NORMAL)
+            )
+
+            uhcNether.setGameRuleValue("doDaylightCycle", "false")
+            uhcNether.setGameRuleValue("naturalRegeneration", "false")
+        }
+
         val uhcNether = Bukkit.createWorld(
             WorldCreator("uhc_nether")
                 .environment(World.Environment.NETHER)
@@ -135,7 +236,8 @@ object MapGenerationService
             )
 
         configureSpectatorBounds()
-        startWorldRegeneration(world = mapWorld())
+
+//        startWorldRegeneration(world = mapWorld())
     }
 
     private fun configureSpectatorBounds()
@@ -197,7 +299,7 @@ object MapGenerationService
         plugin.logger.info("Configured menu filters")
     }
 
-    fun startWorldRegeneration(chunksPerRun: Int = 100, world: World)
+    fun startWorldRegeneration(chunksPerRun: Int = 1000, world: World)
     {
         if (generating)
         {
@@ -209,13 +311,12 @@ object MapGenerationService
             world.name,
             CoordXZ.chunkToBlock(13),
             chunksPerRun,
-            3
+            1
         )
 
         generating = true
         generation = loadTask
 
-        Bukkit.setWhitelist(true)
         Bukkit.broadcastMessage(
             "$prefix${CC.GRAY}Starting to load chunks with ${WorldBorderService.initialSize} as the border size. Whitelist is now enabled as a precaution."
         )
@@ -236,7 +337,7 @@ object MapGenerationService
         loadTask.setTaskID(
             Bukkit.getServer().scheduler
                 .scheduleSyncRepeatingTask(
-                    plugin, loadTask, 5, 5
+                    plugin, loadTask, 2, 2
                 )
         )
     }

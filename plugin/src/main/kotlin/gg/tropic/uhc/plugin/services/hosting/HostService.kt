@@ -5,6 +5,7 @@ import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.scala.lemon.channel.channels.DefaultChatChannel
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.autonomous
 import gg.tropic.uhc.plugin.services.hosting.menu.HostSetupMenu
 import gg.tropic.uhc.plugin.services.scatter.ScatterService
 import gg.tropic.uhc.plugin.services.styles.prefix
@@ -36,19 +37,22 @@ object HostService
     @Configure
     fun configure()
     {
-        Events
-            .subscribe(PlayerJoinEvent::class.java)
-            .expireAfter(1)
-            .handler {
-                if (it.player.hasPermission("uhc.command.host"))
-                {
-                    delayed(1L) {
-                        it.player.chat("/host")
-                        HostSetupMenu().openMenu(it.player)
+        if (!autonomous)
+        {
+            Events
+                .subscribe(PlayerJoinEvent::class.java)
+                .expireAfter(1)
+                .handler {
+                    if (it.player.hasPermission("uhc.command.host"))
+                    {
+                        delayed(1L) {
+                            it.player.chat("/host")
+                            HostSetupMenu().openMenu(it.player)
+                        }
                     }
                 }
-            }
-            .bindWith(plugin)
+                .bindWith(plugin)
+        }
 
         Events
             .subscribe(PlayerQuitEvent::class.java)

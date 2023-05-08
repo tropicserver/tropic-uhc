@@ -1,3 +1,3 @@
 dependencies {
-    compileOnly("gg.scala.cgs:common:1.2.6")
+    compileOnly("gg.scala.cgs:common:1.2.9")
 }

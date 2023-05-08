@@ -7,12 +7,10 @@ import gg.scala.commons.command.ScalaCommand;
 import gg.scala.commons.issuer.ScalaPlayer;
 import gg.tropic.uhc.plugin.engine.UHCGameEngine;
 import net.evilblock.cubed.util.CC;
-import net.minecraft.server.v1_8_R3.Chunk;
-import net.minecraft.server.v1_8_R3.ChunkProviderServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -32,19 +30,18 @@ public class ChunkDumpCommand extends ScalaCommand {
         Location loc = player.bukkit().getLocation();
 
         for (World world : Bukkit.getWorlds()) {
-            ChunkProviderServer cps = ((CraftWorld) world).getHandle().chunkProviderServer;
-            List<Chunk> chunks = new ArrayList<>(cps.chunks.values());
+            List<Chunk> chunks = new ArrayList<>(List.of(world.getLoadedChunks()));
 
             int minX = Integer.MAX_VALUE;
             int minZ = Integer.MAX_VALUE;
             int maxX = Integer.MIN_VALUE;
             int maxZ = Integer.MIN_VALUE;
 
-            for (Chunk chunk : cps.chunks.values()) {
-                if (chunk.locX < minX) minX = chunk.locX;
-                if (chunk.locZ < minZ) minZ = chunk.locZ;
-                if (chunk.locX > maxX) maxX = chunk.locX;
-                if (chunk.locZ > maxZ) maxZ = chunk.locZ;
+            for (Chunk chunk : chunks) {
+                if (chunk.getX() < minX) minX = chunk.getX();
+                if (chunk.getZ() < minZ) minZ = chunk.getZ();
+                if (chunk.getX() > maxX) maxX = chunk.getX();
+                if (chunk.getZ() > maxZ) maxZ = chunk.getZ();
             }
 
             int sizeX = (maxX - minX) + 1;
@@ -63,10 +60,10 @@ public class ChunkDumpCommand extends ScalaCommand {
             BufferedImage image = new BufferedImage((sizeX * 2) + 1, (sizeZ * 2) + 1, BufferedImage.TYPE_INT_RGB);
 
             for (Chunk chunk : chunks) {
-                int x = (chunk.locX - minX) * 2;
-                int z = (chunk.locZ - minZ) * 2;
+                int x = (chunk.getZ() - minX) * 2;
+                int z = (chunk.getZ() - minZ) * 2;
 
-                image.setRGB(x, z, currentWorld && (chunk.locX == playerChunkX && chunk.locZ == playerChunkZ) ?
+                image.setRGB(x, z, currentWorld && (chunk.getZ() == playerChunkX && chunk.getZ() == playerChunkZ) ?
                         Color.ORANGE.getRGB() : Color.GREEN.getRGB());
             }
 

@@ -92,7 +92,10 @@ object ScatterService
     fun configure()
     {
         // whitelist by default to prevent non-hosts from logging in
-        Bukkit.setWhitelist(true)
+        if (!autonomous)
+        {
+            Bukkit.setWhitelist(true)
+        }
 
         Events
             .subscribe(PlayerDropItemEvent::class.java)
@@ -157,6 +160,7 @@ object ScatterService
 
                 Bukkit.getOnlinePlayers()
                     .forEach {
+                        it.resetAttributes()
                         it.sit(false)
                         it.applyLobbyItems()
                         it.removeMetadata("scattered", plugin)
@@ -278,7 +282,10 @@ object ScatterService
                 {
                     Material.BOOK ->
                     {
-                        ConfigurateMenu().openMenu(it.player)
+                        if (!autonomous)
+                        {
+                            ConfigurateMenu().openMenu(it.player)
+                        }
                     }
 
                     Material.JUKEBOX ->
