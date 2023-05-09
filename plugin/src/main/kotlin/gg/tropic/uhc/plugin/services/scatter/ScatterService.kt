@@ -24,6 +24,8 @@ import gg.tropic.uhc.plugin.services.configurate.menu.ConfigurateMenu
 import gg.tropic.uhc.plugin.services.configurate.starterFood
 import gg.tropic.uhc.plugin.services.hosting.hostDisplayName
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
+import gg.tropic.uhc.plugin.services.map.mapNetherWorld
+import gg.tropic.uhc.plugin.services.map.mapWorld
 import gg.tropic.uhc.plugin.services.map.threadlock.ThreadLockUtilities
 import gg.tropic.uhc.plugin.services.scenario.GameScenarioService
 import gg.tropic.uhc.plugin.services.scenario.menu.ScenarioMenu
@@ -345,9 +347,12 @@ object ScatterService
                     LemonConstants.WEB_LINK
                 }/uhc/rules${CC.GOLD}, please acknowledge them.")
 
-                WorldBorderService.currentSize = initialBorderSize
-                    .value.toDouble()
-                BorderUpdateEventExecutor.start()
+                if (!autonomous)
+                {
+                    WorldBorderService.currentSize = initialBorderSize
+                        .value.toDouble()
+                    BorderUpdateEventExecutor.start()
+                }
 
                 GameScenarioService.scenarios
                     .filterValues { it.enabled }
@@ -384,10 +389,18 @@ object ScatterService
                         gracePeriodActive = false
                         Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! ${CC.BOLD}You can now PvP others. Good luck!")
 
-                        Bukkit.dispatchCommand(
-                            Bukkit.getConsoleSender(),
-                            "unmutechat"
-                        )
+                        listOf(mapWorld(), mapNetherWorld())
+                            .forEach {
+                                it.worldBorder.setSize(100.0, 2700)
+                            }
+
+                        if (!autonomous)
+                        {
+                            Bukkit.dispatchCommand(
+                                Bukkit.getConsoleSender(),
+                                "unmutechat"
+                            )
+                        }
                     },
                     {
                         Bukkit.broadcastMessage(

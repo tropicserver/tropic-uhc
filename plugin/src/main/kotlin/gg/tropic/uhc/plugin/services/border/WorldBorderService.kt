@@ -8,11 +8,7 @@ import gg.tropic.uhc.plugin.services.map.mapWorld
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Tasks
-import org.bukkit.Bukkit
-import org.bukkit.Effect
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.entity.Player
 
 /**
@@ -64,6 +60,9 @@ object WorldBorderService
                 val worldBorder = it.worldBorder
                 worldBorder.setCenter(center!!.first, center!!.second)
                 worldBorder.size = size * 2
+                worldBorder.damageBuffer = 1.0
+                worldBorder.damageAmount = 1.0
+                worldBorder.warningTime = 3
             }
     }
 
