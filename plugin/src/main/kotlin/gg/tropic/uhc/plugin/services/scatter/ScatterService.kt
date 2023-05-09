@@ -373,26 +373,33 @@ object ScatterService
                     }
                 )
 
-                createRunner(
-                    (gracePeriod.value * 60) + 1,
-                    {
-                        UHCGameInfo.disqualifyOnLogout = true
-                        gracePeriodActive = false
-                        Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! ${CC.BOLD}You can now PvP others. Good luck!")
+                if (autonomous)
+                {
+                    UHCGameInfo.disqualifyOnLogout = true
+                    gracePeriodActive = false
+                } else
+                {
+                    createRunner(
+                        (gracePeriod.value * 60) + 1,
+                        {
+                            UHCGameInfo.disqualifyOnLogout = true
+                            gracePeriodActive = false
+                            Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! ${CC.BOLD}You can now PvP others. Good luck!")
 
-                        Bukkit.dispatchCommand(
-                            Bukkit.getConsoleSender(),
-                            "unmutechat"
-                        )
-                    },
-                    {
-                        Bukkit.broadcastMessage(
-                            "${CC.SEC}Grace Period ends in ${CC.PRI}${
-                                DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
-                            }${CC.SEC}."
-                        )
-                    }
-                )
+                            Bukkit.dispatchCommand(
+                                Bukkit.getConsoleSender(),
+                                "unmutechat"
+                            )
+                        },
+                        {
+                            Bukkit.broadcastMessage(
+                                "${CC.SEC}Grace Period ends in ${CC.PRI}${
+                                    DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
+                                }${CC.SEC}."
+                            )
+                        }
+                    )
+                }
             }
             .bindWith(plugin)
 
@@ -414,11 +421,15 @@ object ScatterService
                         )
                     }
 
-                Bukkit.setWhitelist(true)
-                Bukkit.dispatchCommand(
-                    Bukkit.getConsoleSender(),
-                    "mutechat"
-                )
+                if (!autonomous)
+                {
+                    Bukkit.setWhitelist(true)
+                    Bukkit.dispatchCommand(
+                        Bukkit.getConsoleSender(),
+                        "mutechat"
+                    )
+                }
+
                 Bukkit.broadcastMessage("$prefix${CC.GREEN}The server is no longer allowing new players to join. Players will now be scattered.")
 
                 // we calculate pre start time in ticks so we're
