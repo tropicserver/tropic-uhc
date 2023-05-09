@@ -88,6 +88,8 @@ object ScatterService
     var lobbyItemApplication = { player: Player -> }
     var postScatterLogic = { player: Player -> }
 
+    var pvpTime: Long? = null
+
     @Configure
     fun configure()
     {
@@ -373,33 +375,28 @@ object ScatterService
                     }
                 )
 
-                if (autonomous)
-                {
-                    UHCGameInfo.disqualifyOnLogout = true
-                    gracePeriodActive = false
-                } else
-                {
-                    createRunner(
-                        (gracePeriod.value * 60) + 1,
-                        {
-                            UHCGameInfo.disqualifyOnLogout = true
-                            gracePeriodActive = false
-                            Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! ${CC.BOLD}You can now PvP others. Good luck!")
+                pvpTime = System.currentTimeMillis() + ((gracePeriod.value * 60) + 1) * 1000
 
-                            Bukkit.dispatchCommand(
-                                Bukkit.getConsoleSender(),
-                                "unmutechat"
-                            )
-                        },
-                        {
-                            Bukkit.broadcastMessage(
-                                "${CC.SEC}Grace Period ends in ${CC.PRI}${
-                                    DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
-                                }${CC.SEC}."
-                            )
-                        }
-                    )
-                }
+                createRunner(
+                    (gracePeriod.value * 60) + 1,
+                    {
+                        UHCGameInfo.disqualifyOnLogout = true
+                        gracePeriodActive = false
+                        Bukkit.broadcastMessage("${CC.GREEN}Grace Period has ended! ${CC.BOLD}You can now PvP others. Good luck!")
+
+                        Bukkit.dispatchCommand(
+                            Bukkit.getConsoleSender(),
+                            "unmutechat"
+                        )
+                    },
+                    {
+                        Bukkit.broadcastMessage(
+                            "${CC.SEC}Grace Period ends in ${CC.PRI}${
+                                DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
+                            }${CC.SEC}."
+                        )
+                    }
+                )
             }
             .bindWith(plugin)
 

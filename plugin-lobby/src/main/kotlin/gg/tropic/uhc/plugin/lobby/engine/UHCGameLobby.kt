@@ -78,22 +78,22 @@ class UHCGameLobby : CgsGameLobby<UHCPlayerModel>(UHCPlayerModel::class)
         override fun getLines(lines: LinkedList<String>, player: Player)
         {
             lines += "${CC.GRAY}${CC.STRIKE_THROUGH}----------------"
-            lines += "${CC.AQUA}Players:"
+            lines += "${CC.PRI}Players:"
             lines += "${CC.WHITE}${
                 Numbers.format(TangerinePlayerTracker.globalPlayers)
             }"
             lines += ""
-            lines += "${CC.AQUA}Coins:"
+            lines += "${CC.PRI}Coins:"
             lines += "${CC.GOLD}${
                 Numbers.format(
                     CoinProfileManager.find(player)?.coins ?: 0
                 )
             }"
             lines += "${CC.GRAY}${CC.STRIKE_THROUGH}----------------"
-            lines += "${CC.AQUA}Glade.GG"
+            lines += "${CC.PRI}Glade.GG"
         }
 
-        override fun getTitle(player: Player) = "${CC.B_AQUA}Glade ${CC.B_WHITE}Network"
+        override fun getTitle(player: Player) = "${CC.B_PRI}Glade ${CC.B_WHITE}Network"
     }
 
     override fun getScoreboardAdapter() = scoreboardAdapter
