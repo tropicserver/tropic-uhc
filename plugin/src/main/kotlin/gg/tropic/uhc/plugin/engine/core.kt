@@ -12,6 +12,7 @@ import gg.tropic.uhc.plugin.TropicUHCPlugin
 import gg.tropic.uhc.plugin.autonomous
 import gg.tropic.uhc.plugin.services.teams.team
 import gg.tropic.uhc.shared.UHCGameInfo
+import gg.tropic.uhc.shared.gamemode.UHCAutoGameMode
 import gg.tropic.uhc.shared.gamemode.UHCSoloGameMode
 import gg.tropic.uhc.shared.player.UHCPlayerModel
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -31,7 +32,7 @@ class UHCGameEngine(
 ) : CgsGameEngine<UHCPlayerModel>(
     plugin,
     UHCGameInfo,
-    UHCSoloGameMode,
+    if (autonomous) UHCAutoGameMode else UHCSoloGameMode,
     UHCPlayerModel::class
 )
 {
