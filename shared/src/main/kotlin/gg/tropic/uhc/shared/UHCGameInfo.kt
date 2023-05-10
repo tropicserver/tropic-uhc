@@ -32,5 +32,6 @@ object UHCGameInfo : CgsGameGeneralInfo(
     {
         this.requiresNoManualConfiguration = false
         this.timeUntilShutdown = 60
+        this.configureCombatLog = true
     }
 }
