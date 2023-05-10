@@ -4,6 +4,7 @@ import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.tropic.uhc.plugin.engine.CountdownRunnable
 import gg.tropic.uhc.shared.player.UHCPlayerModel
+import net.evilblock.cubed.util.CC
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -45,7 +46,7 @@ object GoldenHead {
     fun getSkull(username: String?): ItemStack {
         val goldenHead = ItemStack(Material.SKULL_ITEM, 1, 3.toShort())
         val meta: ItemMeta = goldenHead.itemMeta
-        meta.displayName = username
+        meta.displayName = "${CC.GOLD}$username's Head"
         val sMeta = meta as SkullMeta
         sMeta.setOwner(username)
         goldenHead.setItemMeta(sMeta)

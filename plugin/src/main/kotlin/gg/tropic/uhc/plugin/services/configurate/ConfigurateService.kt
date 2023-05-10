@@ -6,9 +6,11 @@ import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
+import gg.tropic.uhc.plugin.autonomous
 import gg.tropic.uhc.plugin.services.border.WorldBorderService
 import gg.tropic.uhc.plugin.services.map.mapWorld
 import gg.tropic.uhc.plugin.services.scenario.GoldenHead
+import gg.tropic.uhc.plugin.services.scenario.goldenHead
 import gg.tropic.uhc.plugin.services.scenario.playing
 import gg.tropic.uhc.plugin.services.scenario.profile
 import me.lucko.helper.Events
@@ -22,6 +24,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
@@ -172,6 +175,19 @@ object ConfigurateService
             }
             .bindWith(plugin)
 
+        if (autonomous)
+        {
+            Events
+                .subscribe(PlayerDeathEvent::class.java)
+                .filter { CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTED }
+                .handler {
+                    it.drops.add(
+                        GoldenHead.getSkull(it.entity.name)
+                    )
+                }
+                .bindWith(plugin)
+        }
+
         Events
             .subscribe(BlockBreakEvent::class.java)
             .handler {
@@ -255,7 +271,10 @@ object ConfigurateService
                 player.playSound(player.location, Sound.EAT, 10f, 1f)
 
                 // Add 1 heart to the player
-                player.health = player.maxHealth.coerceAtMost(player.health + 1)
+                if (player.health < player.maxHealth)
+                {
+                    player.health += 1
+                }
 
                 fun overridePotionEffect(player: Player, effect: PotionEffect)
                 {

@@ -347,11 +347,18 @@ object ScatterService
                     LemonConstants.WEB_LINK
                 }/uhc/rules${CC.GOLD}, please acknowledge them.")
 
+                WorldBorderService.currentSize = initialBorderSize
+                    .value.toDouble()
+
                 if (!autonomous)
                 {
-                    WorldBorderService.currentSize = initialBorderSize
-                        .value.toDouble()
                     BorderUpdateEventExecutor.start()
+                } else
+                {
+                    WorldBorderService
+                        .pushSizeUpdate(
+                            WorldBorderService.currentSize
+                        )
                 }
 
                 GameScenarioService.scenarios
@@ -362,8 +369,10 @@ object ScatterService
                             .registerEvents(it.value, plugin)
                     }
 
+                val multiplier = (if (!autonomous) 60 else 1)
+
                 createRunner(
-                    (finalHeal.value * 60) + 1,
+                    (finalHeal.value * multiplier) + 1,
                     {
                         remainingPlayers.forEach {
                             it.health = it.maxHealth
@@ -380,10 +389,10 @@ object ScatterService
                     }
                 )
 
-                pvpTime = System.currentTimeMillis() + ((gracePeriod.value * 60) + 1) * 1000
+                pvpTime = System.currentTimeMillis() + ((gracePeriod.value * multiplier) + 1) * 1000
 
                 createRunner(
-                    (gracePeriod.value * if (!autonomous) 60 else 1) + 1,
+                    (gracePeriod.value * multiplier) + 1,
                     {
                         UHCGameInfo.disqualifyOnLogout = true
                         gracePeriodActive = false
