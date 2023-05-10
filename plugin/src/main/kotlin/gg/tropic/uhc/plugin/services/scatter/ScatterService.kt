@@ -383,7 +383,7 @@ object ScatterService
                 pvpTime = System.currentTimeMillis() + ((gracePeriod.value * 60) + 1) * 1000
 
                 createRunner(
-                    (gracePeriod.value * 60) + 1,
+                    (gracePeriod.value * if (!autonomous) 60 else 1) + 1,
                     {
                         UHCGameInfo.disqualifyOnLogout = true
                         gracePeriodActive = false
