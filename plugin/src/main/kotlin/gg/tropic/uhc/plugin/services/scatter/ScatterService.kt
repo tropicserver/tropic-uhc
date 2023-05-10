@@ -2,6 +2,7 @@ package gg.tropic.uhc.plugin.services.scatter
 
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.combat.CombatLogService
 import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
@@ -43,6 +44,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.entity.Zombie
 import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerDropItemEvent
@@ -213,7 +215,9 @@ object ScatterService
                 !gracePeriodActive
             }
             .filter {
-                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTED && it.entity is Player && !it.isCancelled
+                CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTED &&
+                        (it.entity is Player || CombatLogService.combatLog(it.entity) != null) &&
+                        !it.isCancelled
             }
             .handler {
                 it.isCancelled = true
