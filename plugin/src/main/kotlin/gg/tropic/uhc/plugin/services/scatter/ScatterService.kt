@@ -51,6 +51,8 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import java.io.File
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
@@ -330,6 +332,13 @@ object ScatterService
                     .forEach {
                         unsitPlayer(it)
 
+                        if (autonomous)
+                        {
+                            it.addPotionEffect(
+                                PotionEffect(PotionEffectType.FIRE_RESISTANCE, gracePeriod.value * 60, 0)
+                            )
+                        }
+
                         it.profile.apply {
                             limDiamond = 0
                             limGold = 0
@@ -375,23 +384,26 @@ object ScatterService
 
                 val multiplier = (if (!autonomous) 60 else 1)
 
-                createRunner(
-                    (finalHeal.value * multiplier) + 1,
-                    {
-                        remainingPlayers.forEach {
-                            it.health = it.maxHealth
-                        }
+                if (!autonomous)
+                {
+                    createRunner(
+                        (finalHeal.value * multiplier) + 1,
+                        {
+                            remainingPlayers.forEach {
+                                it.health = it.maxHealth
+                            }
 
-                        Bukkit.broadcastMessage("${CC.GREEN}Final Heal has occurred! ${CC.BOLD}Good luck!")
-                    },
-                    {
-                        Bukkit.broadcastMessage(
-                            "${CC.SEC}Final Heal will occur in ${CC.PRI}${
-                                DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
-                            }${CC.SEC}."
-                        )
-                    }
-                )
+                            Bukkit.broadcastMessage("${CC.GREEN}Final Heal has occurred! ${CC.BOLD}Good luck!")
+                        },
+                        {
+                            Bukkit.broadcastMessage(
+                                "${CC.SEC}Final Heal will occur in ${CC.PRI}${
+                                    DurationFormatUtils.formatDurationWords((it * 1000).toLong(), true, true)
+                                }${CC.SEC}."
+                            )
+                        }
+                    )
+                }
 
                 pvpTime = System.currentTimeMillis() + ((gracePeriod.value * multiplier) + 1) * 1000
 
@@ -406,6 +418,14 @@ object ScatterService
                             .forEach {
                                 it.worldBorder.setSize(100.0, 2700)
                             }
+
+                        if (autonomous)
+                        {
+                            Bukkit.getOnlinePlayers()
+                                .forEach { player ->
+                                    player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE)
+                                }
+                        }
 
                         if (!autonomous)
                         {
