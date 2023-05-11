@@ -2,6 +2,8 @@ package gg.tropic.uhc.plugin.services.scatter
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.teams.CgsGameTeam
+import gg.tropic.uhc.plugin.autonomous
+import gg.tropic.uhc.plugin.config
 import gg.tropic.uhc.plugin.services.map.MapGenerationService
 import gg.tropic.uhc.plugin.services.scatter.ScatterService.postScatterLogic
 import gg.tropic.uhc.plugin.services.scatter.ScatterService.scatter
@@ -47,7 +49,7 @@ fun CgsGameTeam.scatter()
 
 fun Player.resetAttributes()
 {
-    health = 20.0
+    health = if (autonomous) config.autonomousInitialHealth else 20.0
     foodLevel = 20
     saturation = 12.8f
     maximumNoDamageTicks = 20

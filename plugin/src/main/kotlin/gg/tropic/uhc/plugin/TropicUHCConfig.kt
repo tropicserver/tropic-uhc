@@ -15,4 +15,5 @@ class TropicUHCConfig
 
     var autonomousGameType = "FFA"
     var autonomousMaxPlayers = 80
+    var autonomousInitialHealth = 40.0
 }

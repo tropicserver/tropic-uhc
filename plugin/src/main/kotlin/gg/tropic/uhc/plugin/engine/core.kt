@@ -62,7 +62,7 @@ class UHCGameEngine(
 
         override fun getStartTime() = Duration.ofSeconds(15)
         override fun timeUntilForcedDeathmatch() = Duration.ofMinutes(36)
-        override fun deathmatchStartStrategy() = DeathmatchStartStrategy.Both
+        override fun deathmatchStartStrategy() = DeathmatchStartStrategy.Timed
     }
 
     override fun getDeathmatchConfig() = if (autonomous) deathmatchConfiguration else null
