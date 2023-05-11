@@ -55,14 +55,14 @@ class UHCGameEngine(
     var deathmatchConfiguration = object : DeathmatchConfiguration
     {
         override fun getMinimumToStartDeathMatch() = 15
-        override fun getTeleportationTime() = Duration.ofMinutes(10L)
+        override fun getTeleportationTime() = Duration.ofSeconds(10L)
 
         override fun onStart() = deathMatchStart()
         override fun onTeleporation() = deathMatchTeleport()
 
         override fun getStartTime() = Duration.ofSeconds(15)
         override fun timeUntilForcedDeathmatch() = Duration.ofMinutes(36)
-        override fun deathmatchStartStrategy() = DeathmatchStartStrategy.Timed
+        override fun deathmatchStartStrategy() = DeathmatchStartStrategy.Both
     }
 
     override fun getDeathmatchConfig() = if (autonomous) deathmatchConfiguration else null

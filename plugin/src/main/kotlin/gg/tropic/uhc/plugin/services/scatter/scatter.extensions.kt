@@ -49,6 +49,7 @@ fun CgsGameTeam.scatter()
 
 fun Player.resetAttributes()
 {
+    maxHealth = if (autonomous) config.autonomousInitialHealth else 20.0
     health = if (autonomous) config.autonomousInitialHealth else 20.0
     foodLevel = 20
     saturation = 12.8f
