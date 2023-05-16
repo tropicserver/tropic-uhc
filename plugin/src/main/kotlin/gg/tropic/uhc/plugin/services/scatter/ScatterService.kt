@@ -495,7 +495,7 @@ object ScatterService
                         val firstNotScattered = teamsNotYetScattered.first()
                         scatteredTeams.add(firstNotScattered.id)
                         firstNotScattered.scatter()
-                    }, 0L, 6)
+                    }, 0L, 10)
             }
             .bindWith(plugin)
     }
@@ -505,7 +505,7 @@ object ScatterService
      * scattered. We also add 10 seconds to compensate for any lag/other issues
      * that may occur and delay the scattering process.
      */
-    fun estimatePreStartTime() = (teamsNotYetScattered.map { it.participants.size }.count() * 6) + (20 * 20)
+    fun estimatePreStartTime() = (teamsNotYetScattered.map { it.participants.size }.count() * 11) + (20 * 20)
 
     fun Player.scatter(
         scatterLocation: Location =
