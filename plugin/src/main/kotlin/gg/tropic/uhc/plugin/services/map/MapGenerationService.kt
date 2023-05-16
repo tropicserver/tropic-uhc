@@ -237,7 +237,10 @@ object MapGenerationService
 
         configureSpectatorBounds()
 
-//        startWorldRegeneration(world = mapWorld())
+        if (!autonomous)
+        {
+            startWorldRegeneration(world = mapWorld())
+        }
     }
 
     private fun configureSpectatorBounds()

@@ -491,7 +491,7 @@ object ScatterService
                             firstNotScattered.scatter()
                         }
 
-                        sleep(50L)
+                        sleep(50L * 12)
                     }
                 }
             }
@@ -503,7 +503,7 @@ object ScatterService
      * scattered. We also add 10 seconds to compensate for any lag/other issues
      * that may occur and delay the scattering process.
      */
-    fun estimatePreStartTime() = (teamsNotYetScattered.map { it.participants.size }.count() * 5) + (20 * 20)
+    fun estimatePreStartTime() = (teamsNotYetScattered.map { it.participants.size }.count() * 15) + (20 * 20)
 
     fun Player.scatter(
         scatterLocation: Location =
