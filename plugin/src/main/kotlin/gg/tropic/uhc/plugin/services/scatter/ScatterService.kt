@@ -35,6 +35,7 @@ import gg.tropic.uhc.plugin.services.styles.prefix
 import gg.tropic.uhc.plugin.services.teams.gameType
 import gg.tropic.uhc.shared.UHCGameInfo
 import me.lucko.helper.Events
+import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
@@ -479,21 +480,22 @@ object ScatterService
                 // going to convert it to 20, and add another second
                 StartingStateRunnable.PRE_START_TIME = (estimatePreStartTime() / 20) + 1
 
-                thread {
-                    while (
-                        CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING &&
-                        teamsNotYetScattered.isNotEmpty()
-                    )
-                    {
-                        val firstNotScattered = teamsNotYetScattered.first()
-                        ThreadLockUtilities.runMainLock {
-                            scatteredTeams.add(firstNotScattered.id)
-                            firstNotScattered.scatter()
+                Schedulers
+                    .sync()
+                    .runRepeating({ task ->
+                        if (
+                            CgsGameEngine.INSTANCE.gameState != CgsGameState.STARTING ||
+                            teamsNotYetScattered.isEmpty()
+                        )
+                        {
+                            task.closeAndReportException()
+                            return@runRepeating
                         }
 
-                        sleep(50L * 12)
-                    }
-                }
+                        val firstNotScattered = teamsNotYetScattered.first()
+                        scatteredTeams.add(firstNotScattered.id)
+                        firstNotScattered.scatter()
+                    }, 0L, 6)
             }
             .bindWith(plugin)
     }
@@ -503,7 +505,7 @@ object ScatterService
      * scattered. We also add 10 seconds to compensate for any lag/other issues
      * that may occur and delay the scattering process.
      */
-    fun estimatePreStartTime() = (teamsNotYetScattered.map { it.participants.size }.count() * 15) + (20 * 20)
+    fun estimatePreStartTime() = (teamsNotYetScattered.map { it.participants.size }.count() * 6) + (20 * 20)
 
     fun Player.scatter(
         scatterLocation: Location =

@@ -3,6 +3,7 @@ package gg.tropic.uhc.plugin.services.map.threadlock;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static net.evilblock.cubed.util.bukkit.Tasks.delayed;
 import static net.evilblock.cubed.util.bukkit.Tasks.sync;
 
 /**
@@ -12,7 +13,7 @@ import static net.evilblock.cubed.util.bukkit.Tasks.sync;
 public class ThreadLockUtilities {
     public static void runMainLock(Runnable runnable) {
         final CountDownLatch latch = new CountDownLatch(1);
-        sync(() -> {
+        delayed(0L, () -> {
             try {
                 runnable.run();
             } catch (Exception exception) {
