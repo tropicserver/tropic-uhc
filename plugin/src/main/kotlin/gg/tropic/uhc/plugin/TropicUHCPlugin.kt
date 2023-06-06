@@ -25,7 +25,6 @@ import gg.tropic.uhc.plugin.engine.UHCGameEngine
 @PluginDependencyComposite(
     PluginDependency("scala-commons"),
     PluginDependency("ScGameFramework"),
-    PluginDependency("features"),
     PluginDependency("cloudsync", soft = true)
 )
 @ContainerConfig(

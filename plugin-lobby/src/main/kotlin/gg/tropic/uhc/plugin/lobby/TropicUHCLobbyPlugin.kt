@@ -23,6 +23,7 @@ import gg.tropic.uhc.plugin.lobby.engine.UHCGameLobby
 @PluginDependencyComposite(
     PluginDependency("scala-commons"),
     PluginDependency("ScGameLobby"),
+    PluginDependency("features"),
     PluginDependency("cloudsync", soft = true)
 )
 class TropicUHCLobbyPlugin : ExtendedScalaPlugin()
