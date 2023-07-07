@@ -143,6 +143,13 @@ object ScatterService
                         .name("${CC.AQUA}Settings ${CC.GRAY}(Right Click)")
                         .build()
                 )
+
+                inventory.setItem(
+                    7, ItemBuilder
+                        .of(Material.SKULL_ITEM)
+                        .name("${CC.GREEN}Profile ${CC.GRAY}(Right Click)")
+                        .build()
+                )
                 inventory.setItem(
                     4, ItemBuilder
                         .of(XMaterial.FIRE_CHARGE)
@@ -312,6 +319,11 @@ object ScatterService
                     Material.REDSTONE_COMPARATOR ->
                     {
                         it.player.chat("/settings")
+                    }
+
+                    Material.SKULL_ITEM ->
+                    {
+                        it.player.chat("/profile")
                     }
 
                     else ->
