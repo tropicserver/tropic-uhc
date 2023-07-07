@@ -16,7 +16,7 @@ object UHCGameInfo : CgsGameGeneralInfo(
     startingCountdownSec = 61,
     awards = CgsGameAwardInfo(
         awardCoins = true,
-        winningCoinRange = 1000..2000,
+        winningCoinRange = 1500..2000,
         participationCoinRange = 250..300
     ),
     preStartVoting = false,
