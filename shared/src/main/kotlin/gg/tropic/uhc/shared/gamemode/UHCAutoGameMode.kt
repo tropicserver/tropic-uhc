@@ -2,6 +2,7 @@ package gg.tropic.uhc.shared.gamemode
 
 import gg.scala.cgs.common.information.arena.CgsGameArena
 import gg.scala.cgs.common.information.mode.CgsGameMode
+import gg.scala.lemon.LemonConstants
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -33,10 +34,19 @@ object UHCAutoGameMode : CgsGameMode
 
         override fun getBukkitWorldName() = "uhc_world"
 
-        override fun getPreLobbyLocation() = Location(
-            Bukkit.getWorld("lobby"),
-            0.5, 65.0, 1.5, -0.0f, 0.0f
-        )
+        override fun getPreLobbyLocation() = if (LemonConstants.SERVER_NAME == "Glade")
+        {
+            Location(
+                Bukkit.getWorld("lobby"),
+                0.5, 65.0, 1.5, -0.0f, 0.0f
+            )
+        } else
+        {
+            Location(
+                Bukkit.getWorld("lobby"),
+                -44.5, 67.0, -90.5, -90.0f, 0.0f
+            )
+        }
 
         override fun getSpectatorLocation() = Location(
             Bukkit.getWorld("uhc_world"),
