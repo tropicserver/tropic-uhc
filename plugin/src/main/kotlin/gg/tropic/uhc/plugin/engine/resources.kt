@@ -139,6 +139,8 @@ object UHCScoreboardRenderer : CgsGameScoreboardRenderer
                 lines += "${CC.B_GREEN}${
                     CgsGameEngine.INSTANCE.winningTeam
                         .participants.first().username()
+                }${
+                    if (gameType.teamSize > 1) "'s team" else ""
                 }"
                 lines += "${CC.GREEN}for winning the game!"
                 lines += ""

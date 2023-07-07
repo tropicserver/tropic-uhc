@@ -226,8 +226,7 @@ object ScatterService
             }
             .filter {
                 CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTED &&
-                        (it.entity is Player || CombatLogService.combatLog(it.entity) != null) &&
-                        !it.isCancelled
+                        (it.entity is Player || CombatLogService.combatLog(it.entity) != null)
             }
             .handler {
                 it.isCancelled = true
