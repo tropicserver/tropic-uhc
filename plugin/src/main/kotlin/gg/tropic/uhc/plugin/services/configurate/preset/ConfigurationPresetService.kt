@@ -1,6 +1,7 @@
 package gg.tropic.uhc.plugin.services.configurate.preset
 
 import gg.scala.commons.persist.datasync.DataSyncService
+import gg.scala.commons.persist.datasync.DataSyncSource
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.tropic.uhc.plugin.TropicUHCPlugin
@@ -31,6 +32,8 @@ object ConfigurationPresetService : DataSyncService<ConfigurationPresetContainer
                 .filterValues { it.enabled }
                 .keys
         )
+
+    override fun locatedIn() = DataSyncSource.Mongo
 
     override fun keys() = ConfigurationPresetKeys
     override fun type() = ConfigurationPresetContainer::class.java

@@ -27,7 +27,7 @@ subprojects {
     dependencies {
         compileOnly(kotlin("stdlib"))
 
-        compileOnly("gg.scala.commons:bukkit:3.1.9")
+        compileOnly("gg.scala.commons:bukkit:3.4.0")
         compileOnly("gg.scala.store:spigot:0.1.8")
         compileOnly("gg.scala.spigot:server:1.1.0")
 

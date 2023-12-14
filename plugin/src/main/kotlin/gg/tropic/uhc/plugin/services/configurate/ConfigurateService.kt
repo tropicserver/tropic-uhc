@@ -264,7 +264,7 @@ object ConfigurateService
                     player.itemInHand = ItemStack(Material.AIR)
                 } else
                 {
-                    hand.amount = hand.amount - 1
+                    hand.amount -= 1
                 }
 
                 //Eat Sound

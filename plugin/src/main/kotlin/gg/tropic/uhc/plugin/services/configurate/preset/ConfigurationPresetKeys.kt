@@ -8,6 +8,8 @@ import gg.scala.commons.persist.datasync.DataSyncKeys
  */
 object ConfigurationPresetKeys : DataSyncKeys
 {
+    override fun newStore() = "uhc-presets"
+
     override fun store() = keyOf("uhcpresets", "configuration")
     override fun sync() = keyOf("uhcpresets", "update")
 }
