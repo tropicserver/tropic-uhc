@@ -43,7 +43,7 @@ object GameTeamService
                 .compose()
                 .monitor()
                 .displayToPlayer { player, player2 ->
-                    player2.team?.id == id && player.team?.id == id
+                    player2.team?.id == id && Bukkit.getPlayer(player)?.team?.id == id
                 }
                 .override(11) {
                     it.hasMetadata("teamchat") && it.team?.id == id
